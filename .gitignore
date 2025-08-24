@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-selfcheck.json
+# pipenv
+.env
+Pipfile.lock
+# IDEs
+.vscode/
+.idea/
+# OS
+.DS_Store
+Thumbs.db
+# Coverage
+.coverage
+htmlcov/
+.pytest_cache/
