@@ -1,6 +1,6 @@
 pygame==2.5.2 
-pytest==8.3.2
-pytest-cov==5.0.0
-ruff==0.6.9
-black==24.8.0
-isort==5.13.2
+ruff==0.6.9  #VER PARA Q ES ?
+
+isort==5.13.2  #ordenear los import
+
+coverage
