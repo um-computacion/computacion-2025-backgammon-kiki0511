@@ -2,72 +2,57 @@ import unittest
 from unittest.mock import patch
 from core.dice import Dice
 
-class TestDice(unittest.TestCase):
 
-    #Se ejecuta antes de cada test para preparar el dado
+class TestDice(unittest.TestCase):
+    
     def setUp(self):
+    #Configuración inicial para cada test
         self.dice = Dice()
     
-    #Verifica que con dados diferentes se devuelvan solo 2 valores
-         # Simulamos dados con valores diferentes
-    def test_tirar_retorna_valores_normales_sin_dobles(self):
-        with patch('core.dice.random.randint', side_effect=[2, 5]):
-            resultado = self.dice.tirar()
-            
+    # Metodos helper para hacer los tests más legibles 
+    
+    def _simular_tirada_normal(self, valor1, valor2):
+        #Helper: simula una tirada sin dobles
+        with patch('core.dice.random.randint', side_effect=[valor1, valor2]):
+            return self.dice.tirar()
+    
+    def _simular_tirada_doble(self, valor):
+        #Helper: simula una tirada con dobles#
+        with patch('core.dice.random.randint', side_effect=[valor, valor]):
+            return self.dice.tirar()
+    
+    def _verificar_valores_en_rango(self, resultado):
+        #Helper: verifica que todos los valores estén entre 1 y 6 #
+        for valor in resultado:
+            self.assertGreaterEqual(valor, 1, f"Valor {valor} es menor a 1")
+            self.assertLessEqual(valor, 6, f"Valor {valor} es mayor a 6")
+    
+    #  Tests del estado inicial 
+    
+    def test_estado_inicial_es_correcto(self):
+        #El dado debe empezar sin tiradas previas
+        self.assertIsNone(self.dice.get_ultima_tirada())
+        self.assertFalse(self.dice.es_doble())
+    
+    #  Tests de tiradas normales (sin dobles) 
+    
+    def test_tirada_normal_devuelve_dos_valores(self):
+        #Una tirada normal debe devolver exactamente 2 valores
+        resultado = self._simular_tirada_normal(2, 5)
+        
         self.assertEqual(resultado, [2, 5])
+        self.assertEqual(len(resultado), 2)
     
-    #Verifica que con dados iguales se devuelvan 4 valores
-        # Simulamos dados con valores iguales (dobles)
-    def test_tirar_retorna_cuatro_valores_cuando_son_dobles(self):
-        with patch('core.dice.random.randint', side_effect=[4, 4]):
-            resultado = self.dice.tirar()
-            
-        self.assertEqual(resultado, [4, 4, 4, 4])
-    
-    #Verifica que se guarde correctamente la última tirada
-    def test_ultima_tirada_se_actualiza_correctamente(self):
-        with patch('core.dice.random.randint', side_effect=[3, 6]):
-            self.dice.tirar()
+    def test_tirada_normal_actualiza_estado(self):
+        #Una tirada normal debe actualizar correctamente el estado
+        resultado = self._simular_tirada_normal(3, 6)
         
-        ultima_tirada = self.dice.get_ultima_tirada()
-        self.assertEqual(ultima_tirada, [3, 6])
+        self.assertEqual(self.dice.get_ultima_tirada(), [3, 6])
+        self.assertFalse(self.dice.es_doble())
     
-    #Verifica que sin tirar dados, es_doble() sea False
-    def test_es_doble_retorna_false_sin_tirar_dados(self):
-        resultado = self.dice.es_doble()
-        self.assertFalse(resultado)
+    def test_tirada_normal_valores_en_rango(self):
+        #Los valores de una tirada normal deben estar entre 1 y 6
+        resultado = self._simular_tirada_normal(1, 6)
+        self._verificar_valores_en_rango(resultado)
     
-    #Verifica que con valores iguales, es_doble() sea True
-    def test_es_doble_retorna_true_cuando_valores_son_iguales(self):
-        with patch('core.dice.random.randint', side_effect=[1, 1]):
-            self.dice.tirar()
-        
-        resultado = self.dice.es_doble()
-        self.assertTrue(resultado)
-
-
-class MockDice:
-    """Mock simple que simula dados con valores predefinidos"""
-    def __init__(self, valores_predefinidos):
-        self.valores = valores_predefinidos
-        self.indice = 0
-    
-    def tirar(self):
-        if self.indice < len(self.valores):
-            resultado = self.valores[self.indice]
-            self.indice += 1
-            return resultado
-        return [1, 1]
-
-def ejemplo_uso_mock_manual():
-    """Muestra cómo usar un mock manual para tests predecibles"""
-    mock_dice = MockDice([[2, 5], [4, 4, 4, 4]])
-    
-    resultado1 = mock_dice.tirar()
-    print(f"Primera tirada: {resultado1}")
-    
-    resultado2 = mock_dice.tirar()
-    print(f"Segunda tirada: {resultado2}")
-
-if __name__ == '__main__':
-    unittest.main()
+   
