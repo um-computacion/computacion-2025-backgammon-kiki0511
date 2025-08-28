@@ -112,4 +112,5 @@ class TestDice(unittest.TestCase):
         # Otra tirada normal
         self._simular_tirada_normal(2, 4)
         self.assertFalse(self.dice.es_doble())
-   
+if __name__ == "__main__":
+    unittest.main()
