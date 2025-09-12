@@ -6,7 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Status: [Development]
 
-## [0.0.01] - 2025-09-30
+## [0.0.1] - 2024-09-12
 
 ### Added
-- Se añadio el fin del juego
+- Se  reorganiza las issue.
+- Empiezo a armar clase player.
+
+#### [0.0.2] - 2024-09-12
+
+### Added
+- Continuo  armando clase player.

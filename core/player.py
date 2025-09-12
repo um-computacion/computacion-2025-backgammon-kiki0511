@@ -14,3 +14,13 @@ class Player:
   
    def get_fichas_en_barra(self):
        return self.__fichas_en_barra__
+   
+   def get_fichas_sacadas(self):
+        return self.__fichas_sacadas__
+  
+   def agregar_ficha_a_barra(self):
+       self.__fichas_en_barra__ = self.__fichas_en_barra__ + 1
+  
+   def quitar_ficha_de_barra(self):
+       if self.__fichas_en_barra__ > 0:
+           self.__fichas_en_barra__ = self.__fichas_en_barra__ - 1
