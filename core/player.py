@@ -24,3 +24,14 @@ class Player:
    def quitar_ficha_de_barra(self):
        if self.__fichas_en_barra__ > 0:
            self.__fichas_en_barra__ = self.__fichas_en_barra__ - 1
+
+
+
+   def sacar_ficha_del_tablero(self):
+       self.__fichas_sacadas__ = self.__fichas_sacadas__ + 1
+  
+   def tiene_fichas_en_barra(self):
+       return self.__fichas_en_barra__ > 0
+  
+   def ha_ganado(self):
+       return self.__fichas_sacadas__ >= 15
