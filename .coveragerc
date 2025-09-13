@@ -1,0 +1,16 @@
+[run]
+source = core
+omit =
+    */tests/*
+    */venv/*
+    */.venv/*
+    */site-packages/*
+    */dist-packages/*
+    */usr/lib/python3.*/*
+
+[report]
+exclude_lines =
+    if __name__ == .__main__.:
+    pragma: no cover
+precision = 2
+show_missing = True
