@@ -26,3 +26,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - continuo con el  armando clase player.
+
+#### [0.0.5] - 2024-09-13
+
+### Added
+- creo la clase dice.
