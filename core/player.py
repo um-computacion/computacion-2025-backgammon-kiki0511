@@ -35,3 +35,10 @@ class Player:
   
    def ha_ganado(self):
        return self.__fichas_sacadas__ >= 15
+
+   def __str__(self):
+       if self.__direccion__ == 1:
+           direccion_texto = "derecha"
+       else:
+           direccion_texto = "izquierda"
+       return f"Jugador: {self.__nombre__} (mueve hacia {direccion_texto})"    
