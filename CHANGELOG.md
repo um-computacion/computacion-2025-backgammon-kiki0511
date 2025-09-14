@@ -41,3 +41,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - Creo la clase checker.
+
+
+#### [0.0.8] - 2024-09-14
+
+### Added
+- Empiezo a crear la clase board.
