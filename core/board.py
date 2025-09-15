@@ -52,3 +52,35 @@ class Board:
            ficha = Checker('negro')
            ficha.set_posicion(12)
            self.__puntos__[12].append(ficha)
+          # 3 fichas en punto 17
+       for _ in range(3):
+           ficha = Checker('negro')
+           ficha.set_posicion(17)
+           self.__puntos__[17].append(ficha)
+      
+       # 5 fichas en punto 19
+       for _ in range(5):
+           ficha = Checker('negro')
+           ficha.set_posicion(19)
+           self.__puntos__[19].append(ficha)
+
+def get_fichas_en_punto(self, punto):
+       
+       if punto < 0 or punto > 25:
+           return []
+       return self.__puntos__[punto]
+  
+def contar_fichas_en_punto(self, punto):
+       
+       return len(self.get_fichas_en_punto(punto))
+  
+def punto_esta_vacio(self, punto):
+       
+       return self.contar_fichas_en_punto(punto) == 0
+  
+def get_color_en_punto(self, punto):
+       
+       fichas = self.get_fichas_en_punto(punto)
+       if len(fichas) == 0:
+           return None
+       return fichas[0].get_color()
