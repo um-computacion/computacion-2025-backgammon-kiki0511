@@ -33,3 +33,22 @@ class Board:
            ficha = Checker('blanco')
            ficha.set_posicion(8)
            self.__puntos__[8].append(ficha)
+
+         # 5 fichas en punto 6
+       for _ in range(5):
+           ficha = Checker('blanco')
+           ficha.set_posicion(6)
+           self.__puntos__[6].append(ficha)
+      
+       # Fichas negras (jugador que mueve hacia izquierda)
+       # 2 fichas en punto 1
+       for _ in range(2):
+           ficha = Checker('negro')
+           ficha.set_posicion(1)
+           self.__puntos__[1].append(ficha)
+      
+       # 5 fichas en punto 12
+       for _ in range(5):
+           ficha = Checker('negro')
+           ficha.set_posicion(12)
+           self.__puntos__[12].append(ficha)
