@@ -84,3 +84,37 @@ def get_color_en_punto(self, punto):
        if len(fichas) == 0:
            return None
        return fichas[0].get_color()
+
+def puede_mover_a_punto(self, punto, color_jugador):
+       
+       if punto < 1 or punto > 24:
+           return False
+      
+       fichas_en_punto = self.contar_fichas_en_punto(punto)
+      
+       # Punto vacío - siempre se puede mover
+       if fichas_en_punto == 0:
+           return True
+      
+       color_en_punto = self.get_color_en_punto(punto)
+      
+       # Punto propio - siempre se puede mover
+       if color_en_punto == color_jugador:
+           return True
+      
+       # Punto enemigo con 1 ficha - se puede capturar
+       if color_en_punto != color_jugador and fichas_en_punto == 1:
+           return True
+      
+       # Punto enemigo con 2 o más fichas - bloqueado
+       return False
+  
+def mover_ficha(self, punto_origen, punto_destino, color_jugador):
+       
+       # Verificar que hay fichas en el origen
+       if self.contar_fichas_en_punto(punto_origen) == 0:
+           return False
+      
+       # Verificar que la ficha es del color correcto
+       if self.get_color_en_punto(punto_origen) != color_jugador:
+           return False
