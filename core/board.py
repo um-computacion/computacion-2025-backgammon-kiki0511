@@ -118,3 +118,39 @@ def mover_ficha(self, punto_origen, punto_destino, color_jugador):
        # Verificar que la ficha es del color correcto
        if self.get_color_en_punto(punto_origen) != color_jugador:
            return False
+       
+         # Verificar que se puede mover al destino
+       if not self.puede_mover_a_punto(punto_destino, color_jugador):
+           return False
+      
+       # Tomar la ficha del origen
+       ficha = self.__puntos__[punto_origen].pop()
+      
+       # Verificar si hay captura
+       if (self.contar_fichas_en_punto(punto_destino) == 1 and
+           self.get_color_en_punto(punto_destino) != color_jugador):
+           # Capturar la ficha enemiga (moverla a la barra)
+           ficha_capturada = self.__puntos__[punto_destino].pop()
+           ficha_capturada.set_posicion(0)
+           self.__puntos__[0].append(ficha_capturada)
+      
+       # Mover la ficha al destino
+       ficha.set_posicion(punto_destino)
+       self.__puntos__[punto_destino].append(ficha)
+      
+       return True
+
+def reingresar_desde_barra(self, color_jugador, destino):
+       """
+       Reingresa una ficha desde la barra (punto 0) al destino segun reglas.
+       Maneja captura si hay 1 ficha enemiga.
+       """
+       if not (1 <= destino <= 24):
+           return False
+       if not self.puede_mover_a_punto(destino, color_jugador):
+           return False
+
+
+       ficha = self.sacar_ficha_de_barra(color_jugador)
+       if ficha is None:
+           return False
