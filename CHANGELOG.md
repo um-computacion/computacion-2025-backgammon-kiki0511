@@ -72,3 +72,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - continuo con la clase board: agregar captura de fichas, verificación y extracción desde barra . 
+
+#### [0.1.3] - 2024-09-22
+
+### Added
+- continuo con la clase board:  agregar verificación de cuadrante final, método sacar_ficha_del_tablero y conteo de fichas sacadas. 

@@ -196,3 +196,34 @@ def puede_sacar_fichas(self, color_jugador):
            cuadrante_final = range(1, 7)  # Puntos 1-6
        else:
            cuadrante_final = range(19, 25)  # Puntos 19-24
+
+ # Verificar que no hay fichas fuera del cuadrante final
+       for punto in range(1, 25):
+           if punto not in cuadrante_final:
+               for ficha in self.get_fichas_en_punto(punto):
+                   if ficha.get_color() == color_jugador:
+                       return False
+       return True
+  
+def sacar_ficha_del_tablero(self, punto, color_jugador):
+       #Saca una ficha del tablero  moviendola al punto 25.
+       if not self.puede_sacar_fichas(color_jugador):
+           return False
+       if self.contar_fichas_en_punto(punto) == 0:
+           return False
+       if self.get_color_en_punto(punto) != color_jugador:
+           return False
+      
+       ficha = self.__puntos__[punto].pop()
+       ficha.set_posicion(25)
+       self.__puntos__[25].append(ficha)
+       return True
+  
+def contar_fichas_sacadas(self, color_jugador):
+       #Cuenta cuántas fichas sacó un jugador (punto 25).
+       fichas_sacadas = self.get_fichas_en_punto(25)
+       contador = 0
+       for ficha in fichas_sacadas:
+           if ficha.get_color() == color_jugador:
+               contador += 1
+       return contador
