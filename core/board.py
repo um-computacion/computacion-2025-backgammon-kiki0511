@@ -154,3 +154,45 @@ def reingresar_desde_barra(self, color_jugador, destino):
        ficha = self.sacar_ficha_de_barra(color_jugador)
        if ficha is None:
            return False
+
+ # Captura si corresponde
+       if (self.contar_fichas_en_punto(destino) == 1 and
+           self.get_color_en_punto(destino) != color_jugador):
+           ficha_capturada = self.__puntos__[destino].pop()
+           ficha_capturada.set_posicion(0)
+           self.__puntos__[0].append(ficha_capturada)
+
+
+       ficha.set_posicion(destino)
+       self.__puntos__[destino].append(ficha)
+       return True
+  
+def jugador_tiene_fichas_en_barra(self, color_jugador):
+       #Verifica si un jugador tiene fichas en la barra (punto 0).
+       fichas_en_barra = self.get_fichas_en_punto(0)
+       for ficha in fichas_en_barra:
+           if ficha.get_color() == color_jugador:
+               return True
+       return False
+  
+def sacar_ficha_de_barra(self, color_jugador):
+       #Saca una ficha del jugador desde la barra (punto 0).
+       fichas_en_barra = self.get_fichas_en_punto(0)
+       for i in range(len(fichas_en_barra)):
+           if fichas_en_barra[i].get_color() == color_jugador:
+               return self.__puntos__[0].pop(i)
+       return None
+  
+def puede_sacar_fichas(self, color_jugador):
+       """
+       Verifica si un jugador puede empezar a sacar fichas del tablero .
+       Requiere que no tenga fichas en barra y que todas estén en el cuadrante final.
+       """
+       if self.jugador_tiene_fichas_en_barra(color_jugador):
+           return False
+      
+       # Definir cuadrante final según el color
+       if color_jugador == 'blanco':
+           cuadrante_final = range(1, 7)  # Puntos 1-6
+       else:
+           cuadrante_final = range(19, 25)  # Puntos 19-24

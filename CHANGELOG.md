@@ -67,3 +67,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - continuo con la clase board.
+
+#### [0.1.2] - 2024-09-22
+
+### Added
+- continuo con la clase board: agregar captura de fichas, verificación y extracción desde barra . 
