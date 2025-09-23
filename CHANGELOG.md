@@ -41,3 +41,44 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - Creo la clase checker.
+
+
+#### [0.0.8] - 2024-09-14
+
+### Added
+- Empiezo a crear la clase board.
+
+#### [0.0.9] - 2024-09-15
+
+### Added
+- Continuo con la creacion de la clase board.
+
+#### [0.0.10] - 2024-09-15
+
+### Added
+- Continuo con la clase board.
+
+#### [0.1.0] - 2024-09-15
+
+### Added
+- sigo con la clase board.
+
+#### [0.1.1] - 2024-09-22
+
+### Added
+- continuo con la clase board.
+
+#### [0.1.2] - 2024-09-22
+
+### Added
+- continuo con la clase board: agregar captura de fichas, verificación y extracción desde barra . 
+
+#### [0.1.3] - 2024-09-22
+
+### Added
+- continuo con la clase board:  agregar verificación de cuadrante final, método sacar_ficha_del_tablero y conteo de fichas sacadas. 
+
+#### [0.1.4] - 2024-09-23
+
+### Added
+- continuo con la clase board:  agregar representación ASCII del tablero con barra y fichas sacadas
