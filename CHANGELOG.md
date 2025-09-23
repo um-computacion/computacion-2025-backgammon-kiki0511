@@ -77,3 +77,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - continuo con la clase board:  agregar verificación de cuadrante final, método sacar_ficha_del_tablero y conteo de fichas sacadas. 
+
+#### [0.1.4] - 2024-09-23
+
+### Added
+- continuo con la clase board:  agregar representación ASCII del tablero con barra y fichas sacadas

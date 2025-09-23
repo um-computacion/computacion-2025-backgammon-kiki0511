@@ -227,3 +227,61 @@ def contar_fichas_sacadas(self, color_jugador):
            if ficha.get_color() == color_jugador:
                contador += 1
        return contador
+
+def __str__(self):
+       """
+       Convierte el tablero a texto ASCII para mostrarlo.
+       Dibuja parte superior (13-24), BAR, parte inferior (12-1) y SACADAS.
+       """
+       resultado = "\n=== TABLERO DE BACKGAMMON ===\n"
+      
+       # Parte superior (puntos 13-24)
+       resultado += "13 14 15 16 17 18   19 20 21 22 23 24\n"
+       for fila in range(5):
+           linea = ""
+           for punto in range(13, 25):
+               fichas = self.get_fichas_en_punto(punto)
+               if fila < len(fichas):
+                   linea += " " + str(fichas[fila]) + " "
+               else:
+                   linea += " . "
+               if punto == 18:
+                   linea += " | "
+           resultado += linea + "\n"
+      
+       resultado += "                    BAR                   \n"
+      
+       # Mostrar fichas en la barra
+       fichas_barra = self.get_fichas_en_punto(0)
+       if len(fichas_barra) > 0:
+           linea_barra = "BARRA: "
+           for ficha in fichas_barra:
+               linea_barra += str(ficha) + " "
+           resultado += linea_barra + "\n"
+      
+       resultado += "                    BAR                   \n"
+      
+       # Parte inferior (puntos 12-1)
+       for fila in range(4, -1, -1):
+           linea = ""
+           for punto in range(12, 0, -1):
+               fichas = self.get_fichas_en_punto(punto)
+               if fila < len(fichas):
+                   linea += " " + str(fichas[fila]) + " "
+               else:
+                   linea += " . "
+               if punto == 7:
+                   linea += " | "
+           resultado += linea + "\n"
+      
+       resultado += "12 11 10  9  8  7    6  5  4  3  2  1\n"
+      
+       # Mostrar fichas sacadas
+       fichas_sacadas = self.get_fichas_en_punto(25)
+       if len(fichas_sacadas) > 0:
+           linea_sacadas = "SACADAS: "
+           for ficha in fichas_sacadas:
+               linea_sacadas += str(ficha) + " "
+           resultado += linea_sacadas + "\n"
+      
+       return resultado
