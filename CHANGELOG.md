@@ -87,3 +87,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - Exepciones : definir BackgammonError y excepciones específicas (movimiento inválido, punto inválido, dado inválido, juego terminado, turno incorrecto, ficha en barra, bear off inválido)
+
+
+#### [0.1.6] - 2024-09-23
+
+### Added
+- Test dice: agregar pruebas unitarias para tiradas normales y estado inicial
