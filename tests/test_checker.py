@@ -31,3 +31,42 @@ class TestChecker(unittest.TestCase):
        #Una ficha nueva no debe estar sacada
        self.assertFalse(self.ficha_blanca.esta_sacada())
        self.assertFalse(self.ficha_negra.esta_sacada())
+
+     # ===== TESTS DE POSICIÃ“N =====
+  
+   def test_establecer_posicion_normal(self):
+       """Debe poder establecer una posiciÃ³n normal en el tablero"""
+       self.ficha_blanca.set_posicion(13)
+       self.assertEqual(self.ficha_blanca.get_posicion(), 13)
+  
+   def test_establecer_posicion_barra(self):
+       """Debe poder establecer la posiciÃ³n en la barra (0)"""
+       self.ficha_blanca.set_posicion(0)
+       self.assertEqual(self.ficha_blanca.get_posicion(), 0)
+       self.assertTrue(self.ficha_blanca.esta_en_barra())
+       self.assertFalse(self.ficha_blanca.esta_sacada())
+  
+   def test_establecer_posicion_sacada(self):
+       """Debe poder establecer la posiciÃ³n como sacada (25)"""
+       self.ficha_blanca.set_posicion(25)
+       self.assertEqual(self.ficha_blanca.get_posicion(), 25)
+       self.assertFalse(self.ficha_blanca.esta_en_barra())
+       self.assertTrue(self.ficha_blanca.esta_sacada())
+  
+   def test_cambiar_posicion_multiples_veces(self):
+       """Debe poder cambiar la posiciÃ³n varias veces"""
+       # Posicion inicial
+       self.ficha_blanca.set_posicion(24)
+       self.assertEqual(self.ficha_blanca.get_posicion(), 24)
+      
+       # Mover a otro punto
+       self.ficha_blanca.set_posicion(18)
+       self.assertEqual(self.ficha_blanca.get_posicion(), 18)
+      
+       # Mover a la barra
+       self.ficha_blanca.set_posicion(0)
+       self.assertTrue(self.ficha_blanca.esta_en_barra())
+      
+       # Sacar del tablero
+       self.ficha_blanca.set_posicion(25)
+       self.assertTrue(self.ficha_blanca.esta_sacada())
