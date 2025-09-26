@@ -129,3 +129,32 @@ class BackgammonGame:
 
 
        return True
+
+# ============== turno/estado ==============
+   def terminar_turno(self):
+       self.__jugador_actual__ = self.__jugador2__ if self.__jugador_actual__ == self.__jugador1__ else self.__jugador1__
+       self.__movimientos_disponibles__ = []
+
+
+   def verificar_victoria(self):
+       pass
+
+
+   def puede_hacer_algun_movimiento(self):
+       return len(self.__movimientos_disponibles__) > 0
+
+
+   def get_estado_juego(self):
+       return {
+           'jugador_actual': self.__jugador_actual__.get_nombre(),
+           'color_actual': self.get_color_jugador_actual(),
+           'movimientos_disponibles': self.__movimientos_disponibles__.copy(),
+           'juego_terminado': self.__juego_terminado__,
+           'ganador': self.__ganador__.get_nombre() if self.__ganador__ else None
+       }
+
+
+   def __str__(self):
+       """Muestra nombres de jugadores y el tablero en texto."""
+       encabezado = f"Backgammon: {self.__jugador1__.get_nombre()} vs {self.__jugador2__.get_nombre()}"
+       return f"{encabezado}\n{str(self.__tablero__)}"
