@@ -178,3 +178,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 -test player: gestión de fichas en barra y fichas sacadas
+
+#### [0.3.4] - 2024-09-26
+
+### Added
+-test player: independencia entre jugadores, representación y casos límite

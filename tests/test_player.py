@@ -153,3 +153,104 @@ class TestPlayer(unittest.TestCase):
                self.assertFalse(self.jugador_negro.ha_ganado())
            else:
                self.assertTrue(self.jugador_negro.ha_ganado())
+
+ # ===== TESTS DE INDEPENDENCIA ENTRE JUGADORES =====
+  
+   def test_jugadores_son_independientes_barra(self):
+       #Las fichas en barra de un jugador no afectan al otro
+       self.jugador_blanco.agregar_ficha_a_barra()
+       self.jugador_blanco.agregar_ficha_a_barra()
+      
+       # El jugador negro no debe verse afectado
+       self.assertEqual(self.jugador_negro.get_fichas_en_barra(), 0)
+       self.assertFalse(self.jugador_negro.tiene_fichas_en_barra())
+  
+   def test_jugadores_son_independientes_sacadas(self):
+       #Las fichas sacadas de un jugador no afectan al otro
+       for i in range(10):
+           self.jugador_blanco.sacar_ficha_del_tablero()
+      
+       # El jugador negro no debe verse afectado
+       self.assertEqual(self.jugador_negro.get_fichas_sacadas(), 0)
+       self.assertFalse(self.jugador_negro.ha_ganado())
+  
+   def test_victoria_independiente(self):
+       # La victoria de un jugador no afecta al otro
+       # Jugador blanco gana
+       for i in range(15):
+           self.jugador_blanco.sacar_ficha_del_tablero()
+      
+       self.assertTrue(self.jugador_blanco.ha_ganado())
+       self.assertFalse(self.jugador_negro.ha_ganado())
+  
+   # ===== TESTS DE REPRESENTACION STRING =====
+  
+   def test_str_jugador_blanco(self):
+       #La representacion string del jugador blanco debe ser correcta
+       resultado = str(self.jugador_blanco)
+      
+       self.assertIn("Ana", resultado)
+       self.assertIn("derecha", resultado)
+       self.assertIn("Jugador:", resultado)
+  
+   def test_str_jugador_negro(self):
+       #La representacion string del jugador negro debe ser correcta
+       resultado = str(self.jugador_negro)
+      
+       self.assertIn("Luis", resultado)
+       self.assertIn("izquierda", resultado)
+       self.assertIn("Jugador:", resultado)
+  
+   def test_str_direcciones_correctas(self):
+       #Las direcciones en string deben ser correctas para cada jugador
+       str_blanco = str(self.jugador_blanco)
+       str_negro = str(self.jugador_negro)
+      
+       self.assertIn("derecha", str_blanco)
+       self.assertNotIn("izquierda", str_blanco)
+      
+       self.assertIn("izquierda", str_negro)
+       self.assertNotIn("derecha", str_negro)
+  
+   # ===== TESTS DE CASOS LIMITE =====
+  
+   def test_nombre_vacio(self):
+       #Debe manejar nombres vaci­os correctamente
+       jugador_sin_nombre = Player("", 1)
+      
+       self.assertEqual(jugador_sin_nombre.get_nombre(), "")
+       resultado = str(jugador_sin_nombre)
+       self.assertIn("Jugador:", resultado)
+  
+   def test_nombre_muy_largo(self):
+       #Debe manejar nombres muy largos
+       nombre_largo = "A" * 100
+       jugador_nombre_largo = Player(nombre_largo, 1)
+      
+       self.assertEqual(jugador_nombre_largo.get_nombre(), nombre_largo)
+       resultado = str(jugador_nombre_largo)
+       self.assertIn(nombre_largo, resultado)
+  
+   def test_direccion_invalida_procesada_correctamente(self):
+       #Debe procesar direcciones no estandar
+       jugador_dir_rara = Player("Test", 0)
+      
+       self.assertEqual(jugador_dir_rara.get_direccion(), 0)
+       resultado = str(jugador_dir_rara)
+       self.assertIn("izquierda", resultado)  # Cualquier cosa != 1 es izquierda
+  
+   def test_multiples_operaciones_secuenciales(self):
+       # Debe manejar multiples operaciones en secuencia
+       # Secuencia compleja de operaciones
+       self.jugador_blanco.agregar_ficha_a_barra()
+       self.jugador_blanco.agregar_ficha_a_barra()
+       self.jugador_blanco.sacar_ficha_del_tablero()
+       self.jugador_blanco.quitar_ficha_de_barra()
+       self.jugador_blanco.sacar_ficha_del_tablero()
+       self.jugador_blanco.sacar_ficha_del_tablero()
+      
+       # Verificar estado final
+       self.assertEqual(self.jugador_blanco.get_fichas_en_barra(), 1)
+       self.assertEqual(self.jugador_blanco.get_fichas_sacadas(), 3)
+       self.assertTrue(self.jugador_blanco.tiene_fichas_en_barra())
+       self.assertFalse(self.jugador_blanco.ha_ganado())
