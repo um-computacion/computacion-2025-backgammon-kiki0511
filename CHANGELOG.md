@@ -168,3 +168,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 -test game: casos límite y paso automático de turno
+
+#### [0.3.2] - 2024-09-26
+
+### Added
+-test player: pruebas iniciales de creación y atributos de Player
