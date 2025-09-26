@@ -128,3 +128,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - agregar helper _calcular_destino y validación inicial de movimientos
+
+#### [0.2.3] - 2024-09-25
+
+### Added
+- implementar ejecución de movimientos con reingreso y consumo de dados

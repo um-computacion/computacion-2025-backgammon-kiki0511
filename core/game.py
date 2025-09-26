@@ -56,7 +56,7 @@ class BackgammonGame:
 
 
    # ============== validación ==============
-   
+
    def puede_hacer_movimiento(self, punto_origen, valor_dado):
        if valor_dado not in self.__movimientos_disponibles__:
            return False
@@ -82,3 +82,50 @@ class BackgammonGame:
 
 
        destino = self._calcular_destino(punto_origen, valor_dado, color)
+
+    # Por simplicidad, aún no implementamos bear off aquí
+       if not (1 <= destino <= 24):
+           return False
+
+
+       return tablero.puede_mover_a_punto(destino, color)
+
+
+   # ============== ejecución ==============
+   def hacer_movimiento(self, punto_origen, valor_dado):
+       color = self.get_color_jugador_actual()
+       tablero = self.__tablero__
+
+
+       if not self.puede_hacer_movimiento(punto_origen, valor_dado):
+           return False
+
+
+       destino = self._calcular_destino(punto_origen, valor_dado, color)
+
+
+       # Reingreso desde barra
+       if punto_origen == 0:
+           ok = tablero.reingresar_desde_barra(color, destino)
+           if not ok:
+               return False
+       else:
+           # Movimiento normal
+           ok = tablero.mover_ficha(punto_origen, destino, color)
+           if not ok:
+               return False
+
+
+       # Consumir el dado usado
+       try:
+           self.__movimientos_disponibles__.remove(valor_dado)
+       except ValueError:
+           pass
+
+
+       # Si no quedan movimientos, cambio de turno
+       if len(self.__movimientos_disponibles__) == 0:
+           self.terminar_turno()
+
+
+       return True
