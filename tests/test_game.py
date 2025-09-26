@@ -83,3 +83,63 @@ class TestBackgammonGame(unittest.TestCase):
        self.juego.terminar_turno()
        self.assertEqual(self.juego.get_color_jugador_actual(), 'blanco')
   
+ # ===== TESTS DE CALCULO DE DESTINOS =====
+  
+   def test_calcular_punto_destino_jugador_blanco(self):
+       #Jugador blanco debe mover hacia numeros menores
+       # Jugador 1 (blanco) mueve hacia la derecha (numeros decrecientes)
+       destino = self.juego.calcular_punto_destino(13, 5)
+       self.assertEqual(destino, 8)  # 13 - 5 = 8
+  
+   def test_calcular_punto_destino_jugador_negro(self):
+       #Jugador negro debe mover hacia numeros mayores
+       # Cambiar al jugador 2 (negro)
+       self.juego.terminar_turno()
+      
+       destino = self.juego.calcular_punto_destino(12, 3)
+       self.assertEqual(destino, 15)  # 12 + 3 = 15
+  
+   # ===== TESTS DE VALIDACION DE MOVIMIENTOS =====
+  
+   @patch('core.dice.random.randint')
+   def test_puede_hacer_movimiento_valido(self, mock_randint):
+       #Debe poder validar movimientos correctos
+       mock_randint.side_effect = [2, 3]
+       self.juego.tirar_dados()
+      
+       # Mover ficha blanca del punto 24
+       self.assertTrue(self.juego.puede_hacer_movimiento(24, 2))
+       self.assertTrue(self.juego.puede_hacer_movimiento(24, 3))
+  
+   @patch('core.dice.random.randint')
+   def test_no_puede_hacer_movimiento_sin_dados(self, mock_randint):
+       # No debe poder hacer movimientos sin dados disponibles
+       # No tirar dados
+       self.assertFalse(self.juego.puede_hacer_movimiento(24, 3))
+  
+   @patch('core.dice.random.randint')
+   def test_no_puede_usar_valor_no_disponible(self, mock_randint):
+       #No debe poder usar un valor de dado que no tiene
+       mock_randint.side_effect = [2, 3]
+       self.juego.tirar_dados()
+      
+       # Intentar usar un 5 cuando solo tiene 2 y 3
+       self.assertFalse(self.juego.puede_hacer_movimiento(24, 5))
+  
+   @patch('core.dice.random.randint')
+   def test_no_puede_mover_desde_punto_vacio(self, mock_randint):
+       # No debe poder mover desde un punto sin fichas
+       mock_randint.side_effect = [2, 3]
+       self.juego.tirar_dados()
+      
+       # Punto 2 esta vacio inicialmente
+       self.assertFalse(self.juego.puede_hacer_movimiento(2, 2))
+  
+   @patch('core.dice.random.randint')
+   def test_no_puede_mover_ficha_enemiga(self, mock_randint):
+       # No debe poder mover fichas del oponente
+       mock_randint.side_effect = [2, 3]
+       self.juego.tirar_dados()
+      
+       # Punto 1 tiene fichas negras, jugador actual es blanco
+       self.assertFalse(self.juego.puede_hacer_movimiento(1, 2))
