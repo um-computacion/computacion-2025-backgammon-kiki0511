@@ -119,3 +119,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - agregar casos límite y validación de todas las posiciones (0–25)
 
+#### [0.2.2] - 2024-09-25
+
+### Added
+- implementar clase BackgammonGame con inicialización y tirada de dados.
