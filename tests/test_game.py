@@ -203,3 +203,93 @@ class TestBackgammonGame(unittest.TestCase):
            self.juego.terminar_turno()
            self.assertEqual(len(self.juego.get_movimientos_disponibles()), 0)
   
+   # ===== TESTS DE DETECCION DE MOVIMIENTOS DISPONIBLES =====
+  
+   @patch('core.dice.random.randint')
+   def test_puede_hacer_algun_movimiento_true(self, mock_randint):
+       #Debe detectar cuando hay movimientos disponibles
+       mock_randint.side_effect = [1, 2]
+       self.juego.tirar_dados()
+      
+       self.assertTrue(self.juego.puede_hacer_algun_movimiento())
+  
+   def test_puede_hacer_algun_movimiento_false_sin_dados(self):
+       #Sin dados no debe poder hacer movimientos
+       # No tirar dados
+       self.assertFalse(self.juego.puede_hacer_algun_movimiento())
+  
+   # ===== TESTS DE ESTADO DEL JUEGO =====
+  
+   def test_get_estado_juego_inicial(self):
+       #El estado inicial debe ser correcto
+       estado = self.juego.get_estado_juego()
+      
+       self.assertEqual(estado['jugador_actual'], "Jugador1")
+       self.assertEqual(estado['color_actual'], 'blanco')
+       self.assertEqual(estado['movimientos_disponibles'], [])
+       self.assertFalse(estado['juego_terminado'])
+       self.assertIsNone(estado['ganador'])
+  
+   @patch('core.dice.random.randint')
+   def test_get_estado_juego_con_movimientos(self, mock_randint):
+       #El estado debe reflejar movimientos disponibles
+       mock_randint.side_effect = [4, 6]
+       self.juego.tirar_dados()
+      
+       estado = self.juego.get_estado_juego()
+      
+       self.assertEqual(estado['movimientos_disponibles'], [4, 6])
+  
+   # ===== TESTS DE VICTORIA =====
+  
+   def test_verificar_victoria_no_ganador_inicial(self):
+       #Al inicio no debe haber ganador
+       self.juego.verificar_victoria()
+      
+       self.assertFalse(self.juego.esta_terminado())
+       self.assertIsNone(self.juego.get_ganador())
+  
+   def test_detectar_victoria_simulada(self):
+       #Debe detectar victoria cuando un jugador saca 15 fichas
+       # Simular que el jugador blanco saca todas las fichas
+       tablero = self.juego.get_tablero()
+      
+       # Limpiar tablero y poner todas las fichas como sacadas
+       for punto in range(26):
+           tablero.get_fichas_en_punto(punto).clear()
+      
+       # Agregar 15 fichas blancas a la zona de sacado
+       from core.checker import Checker
+       for i in range(15):
+           ficha = Checker('blanco')
+           ficha.set_posicion(25)
+           tablero.get_fichas_en_punto(25).append(ficha)
+      
+       # Verificar victoria
+       self.juego.verificar_victoria()
+      
+       self.assertTrue(self.juego.esta_terminado())
+       self.assertEqual(self.juego.get_ganador(), self.juego.get_jugador1())
+  
+   # ===== TESTS DE REPRESENTACION =====
+  
+   def test_str_juego_contiene_info_basica(self):
+       #La representacion string debe contener informacion basica
+       resultado = str(self.juego)
+      
+       self.assertIn("BACKGAMMON", resultado)
+       self.assertIn("Jugador1", resultado)
+       self.assertIn("Jugador2", resultado)
+       self.assertIn("Blancas", resultado)
+       self.assertIn("Negras", resultado)
+  
+   @patch('core.dice.random.randint')
+   def test_str_juego_con_movimientos(self, mock_randint):
+       # Debe mostrar movimientos cuando estan disponibles
+       mock_randint.side_effect = [3, 5]
+       self.juego.tirar_dados()
+      
+       resultado = str(self.juego)
+      
+       self.assertIn("Movimientos disponibles", resultado)
+       self.assertIn("[3, 5]", resultado)

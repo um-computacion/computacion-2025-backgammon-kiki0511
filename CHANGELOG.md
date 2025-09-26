@@ -158,3 +158,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 -test game: ejecución de movimientos y gestión de turnos
+
+#### [0.3.0] - 2024-09-26
+
+### Added
+-test game: estado del juego, victoria y representación en string
