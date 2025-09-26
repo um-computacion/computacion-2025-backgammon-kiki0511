@@ -98,3 +98,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - Test dice: incluir validación de rango, pruebas de tiradas dobles y transiciones entre estados normal/doble.
+
+#### [0.1.8] - 2024-09-24
+
+### Added
+- agregar tests iniciales para clase Checker.
+
+#### [0.1.9] - 2024-09-24
+
+### Added
+- añadir pruebas de posiciones para Checker.
+
+#### [0.2.0] - 2024-09-24
+
+### Added
+- añadir pruebas de estados y representación en Checker
+
+#### [0.2.1] - 2024-09-25
+
+### Added
+- agregar casos límite y validación de todas las posiciones (0–25)
+
