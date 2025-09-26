@@ -293,3 +293,173 @@ class TestBackgammonGame(unittest.TestCase):
       
        self.assertIn("Movimientos disponibles", resultado)
        self.assertIn("[3, 5]", resultado)
+
+# ===== TESTS DE CASOS LIMITE =====
+  
+   def test_juego_con_nombres_vacios(self):
+       #Debe manejar nombres de jugadores vacios
+       juego = BackgammonGame("", "")
+      
+       self.assertEqual(juego.get_jugador1().get_nombre(), "")
+       self.assertEqual(juego.get_jugador2().get_nombre(), "")
+  
+   def test_juego_con_nombres_muy_largos(self):
+       #Debe manejar nombres de jugadores muy largos
+       nombre_largo = "A" * 100
+       juego = BackgammonGame(nombre_largo, nombre_largo)
+      
+       self.assertEqual(juego.get_jugador1().get_nombre(), nombre_largo)
+       self.assertEqual(juego.get_jugador2().get_nombre(), nombre_largo)
+  
+   # ===== TESTS DE PASO AUTOMATICO DE TURNO =====
+  
+   @patch('core.dice.random.randint')
+   def test_tirar_dados_sin_movimientos_pasa_automaticamente(self, mock_randint):
+       #Debe pasar automaticamente si no hay movimientos al tirar dados
+       mock_randint.side_effect = [6, 6]
+      
+       # Crear situacion sin movimientos posibles
+       tablero = self.juego.get_tablero()
+       for punto in range(26):
+           tablero.get_fichas_en_punto(punto).clear()
+      
+       # Poner ficha blanca en punto 1
+       from core.checker import Checker
+       ficha = Checker('blanco')
+       ficha.set_posicion(1)
+       tablero.get_fichas_en_punto(1).append(ficha)
+      
+       # Bloquear puntos 2-7 con fichas negras
+       for punto in range(2, 8):
+           for i in range(2):
+               ficha_negra = Checker('negro')
+               ficha_negra.set_posicion(punto)
+               tablero.get_fichas_en_punto(punto).append(ficha_negra)
+      
+       resultado, estado = self.juego.tirar_dados()
+      
+       self.assertEqual(estado, "sin_movimientos")
+       self.assertTrue(self.juego.turno_paso_automaticamente())
+       self.assertEqual(self.juego.get_jugador_actual(), self.juego.get_jugador2())
+  
+   @patch('core.dice.random.randint')
+   def test_tirar_dados_con_movimientos_no_pasa(self, mock_randint):
+       #No debe pasar automaticamente si hay movimientos disponibles
+       mock_randint.side_effect = [3, 5]
+      
+       resultado, estado = self.juego.tirar_dados()
+      
+       self.assertEqual(estado, "con_movimientos")
+       self.assertFalse(self.juego.turno_paso_automaticamente())
+       self.assertEqual(self.juego.get_jugador_actual(), self.juego.get_jugador1())
+  
+   @patch('core.dice.random.randint')
+   def test_ultimo_movimiento_agota_dados_pasa_turno(self, mock_randint):
+       #Debe pasar automaticamente cuando se agotan los dados
+       mock_randint.side_effect = [1, 2]
+       self.juego.tirar_dados()
+      
+       # Hacer primer movimiento
+       exito, estado = self.juego.hacer_movimiento(24, 1)
+       self.assertTrue(exito)
+       self.assertEqual(estado, "continua")
+      
+       # Hacer segundo movimiento (ultimo)
+       exito, estado = self.juego.hacer_movimiento(24, 2)
+       self.assertTrue(exito)
+       self.assertEqual(estado, "sin_dados")
+      
+       # Debe haber cambiado de jugador
+       self.assertEqual(self.juego.get_jugador_actual(), self.juego.get_jugador2())
+  
+   def test_flag_paso_automatico_inicial_false(self):
+       # El flag de paso automatico debe ser False al inicio
+       self.assertFalse(self.juego.turno_paso_automaticamente())
+  
+   @patch('core.dice.random.randint')
+   def test_flag_se_resetea_con_nuevos_dados(self, mock_randint):
+       """El flag debe resetearse cuando se tiran nuevos dados"""
+       mock_randint.side_effect = [3, 5]
+      
+       # Simular paso automatico anterior
+       self.juego._BackgammonGame__turno_paso_automatico__ = True
+      
+       # Tirar dados debe resetear el flag
+       self.juego.tirar_dados()
+       self.assertFalse(self.juego.turno_paso_automaticamente())
+  
+   @patch('core.dice.random.randint')
+   def test_forzar_pasar_turno_no_activa_flag(self, mock_randint):
+       #Pasar manualmente no debe activar el flag de paso automatico
+       mock_randint.side_effect = [3, 5]
+       self.juego.tirar_dados()
+      
+       self.juego.forzar_pasar_turno()
+      
+       self.assertFalse(self.juego.turno_paso_automaticamente())
+       self.assertEqual(self.juego.get_jugador_actual(), self.juego.get_jugador2())
+  
+   def test_estado_juego_incluye_flag_paso_automatico(self):
+       # el estado del juego debe incluir el flag de paso automatico
+       estado = self.juego.get_estado_juego()
+      
+       self.assertIn('turno_paso_automatico', estado)
+       self.assertIn('puede_hacer_movimientos', estado)
+       self.assertFalse(estado['turno_paso_automatico'])
+  
+   @patch('core.dice.random.randint')
+   def test_estado_puede_hacer_movimientos_con_dados(self, mock_randint):
+       #Con dados disponibles debe poder hacer movimientos
+       mock_randint.side_effect = [3, 5]
+       self.juego.tirar_dados()
+      
+       estado = self.juego.get_estado_juego()
+       self.assertTrue(estado['puede_hacer_movimientos'])
+  
+   @patch('core.dice.random.randint')
+   def test_verificar_fin_turno_automatico_sin_dados(self, mock_randint):
+       #Verificar fin de turno cuando no hay dados disponibles
+       # Sin dados, verificar fin de turno no deberia cambiar nada
+       resultado = self.juego.verificar_fin_de_turno_automatico()
+       self.assertEqual(resultado, "continua")
+  
+   @patch('core.dice.random.randint')
+   def test_flujo_completo_con_paso_automatico(self, mock_randint):
+       #Test de flujo completo con paso automatico usando dobles
+       mock_randint.side_effect = [2, 2]  # Dobles de 2
+       resultado, estado = self.juego.tirar_dados()
+      
+       self.assertEqual(len(resultado), 4)  # 4 movimientos
+       self.assertEqual(estado, "con_movimientos")
+      
+       jugador_inicial = self.juego.get_jugador_actual()
+      
+       # Hacer 4 movimientos para agotar todos los dados
+       for i in range(4):
+           exito, estado_mov = self.juego.hacer_movimiento(24, 2)
+           self.assertTrue(exito)
+          
+           if i < 3:
+               self.assertEqual(estado_mov, "continua")
+               self.assertEqual(self.juego.get_jugador_actual(), jugador_inicial)
+           else:
+               self.assertEqual(estado_mov, "sin_dados")
+               self.assertNotEqual(self.juego.get_jugador_actual(), jugador_inicial)
+  
+   @patch('core.dice.random.randint')
+   def test_movimiento_exitoso_resetea_flag_automatico(self, mock_randint):
+       #Un movimiento exitoso debe resetear el flag de paso automatico
+       mock_randint.side_effect = [3, 5]
+       self.juego.tirar_dados()
+      
+       # Simular flag activado
+       self.juego._BackgammonGame__turno_paso_automatico__ = True
+      
+       # Hacer movimiento debe resetear el flag
+       exito, estado = self.juego.hacer_movimiento(24, 3)
+       self.assertTrue(exito)
+       self.assertFalse(self.juego.turno_paso_automaticamente())
+
+
+if __name__ == "__main__":
+   unittest.main()
