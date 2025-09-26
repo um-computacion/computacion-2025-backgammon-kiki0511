@@ -139,3 +139,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - game: implementar ejecución de movimientos con reingreso y consumo de dados
 
+#### [0.2.6] - 2024-09-26
+
+### Added
+-test game: pruebas iniciales de BackgammonGame
+
