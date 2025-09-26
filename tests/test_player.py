@@ -254,3 +254,33 @@ class TestPlayer(unittest.TestCase):
        self.assertEqual(self.jugador_blanco.get_fichas_sacadas(), 3)
        self.assertTrue(self.jugador_blanco.tiene_fichas_en_barra())
        self.assertFalse(self.jugador_blanco.ha_ganado())
+
+  # ===== TESTS DE VALORES LIMITE =====
+  
+   def test_exactamente_14_fichas_sacadas(self):
+       # Con 14 fichas sacadas no debe haber victoria
+       for i in range(14):
+           self.jugador_blanco.sacar_ficha_del_tablero()
+      
+       self.assertEqual(self.jugador_blanco.get_fichas_sacadas(), 14)
+       self.assertFalse(self.jugador_blanco.ha_ganado())
+  
+   def test_exactamente_16_fichas_sacadas(self):
+       # Con 16 fichas sacadas debe haber victoria
+       for i in range(16):
+           self.jugador_blanco.sacar_ficha_del_tablero()
+      
+       self.assertEqual(self.jugador_blanco.get_fichas_sacadas(), 16)
+       self.assertTrue(self.jugador_blanco.ha_ganado())
+  
+   def test_muchas_fichas_en_barra(self):
+       # Debe manejar muchas fichas en la barra 
+       for i in range(50):  # Mas fichas de las que tiene un jugador
+           self.jugador_blanco.agregar_ficha_a_barra()
+      
+       self.assertEqual(self.jugador_blanco.get_fichas_en_barra(), 50)
+       self.assertTrue(self.jugador_blanco.tiene_fichas_en_barra())
+
+
+if __name__ == "__main__":
+   unittest.main()
