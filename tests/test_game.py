@@ -36,3 +36,50 @@ class TestBackgammonGame(unittest.TestCase):
        #No debe haber movimientos disponibles antes de tirar dados
        self.assertEqual(len(self.juego.get_movimientos_disponibles()), 0)
   
+ # ===== TESTS DE TIRADA DE DADOS =====
+  
+   @patch('core.dice.random.randint')
+   def test_tirar_dados_normal(self, mock_randint):
+       #Debe poder tirar dados y obtener movimientos normales
+       mock_randint.side_effect = [3, 5]
+      
+       resultado = self.juego.tirar_dados()
+      
+       self.assertEqual(resultado, [3, 5])
+       self.assertEqual(self.juego.get_movimientos_disponibles(), [3, 5])
+  
+   @patch('core.dice.random.randint')
+   def test_tirar_dados_dobles(self, mock_randint):
+       #Debe poder tirar dobles y obtener 4 movimientos
+       mock_randint.side_effect = [4, 4]
+      
+       resultado = self.juego.tirar_dados()
+      
+       self.assertEqual(resultado, [4, 4, 4, 4])
+       self.assertEqual(self.juego.get_movimientos_disponibles(), [4, 4, 4, 4])
+  
+   def test_no_puede_tirar_dados_si_ya_tiro(self):
+       #No debe poder tirar dados si ya tirÃ³ en este turno
+       with patch('core.dice.random.randint', side_effect=[2, 6]):
+           self.juego.tirar_dados()
+          
+           # Intentar tirar de nuevo debera fallar
+           with self.assertRaises(TurnoIncorrectoError):
+               self.juego.tirar_dados()
+  
+   # ===== TESTS DE COLORES DE JUGADORES =====
+  
+   def test_color_jugador_actual_inicial(self):
+       #El primer jugador debe ser blanco
+       self.assertEqual(self.juego.get_color_jugador_actual(), 'blanco')
+  
+   def test_color_jugador_cambia_con_turno(self):
+       #El color debe cambiar cuando cambia el turno
+       self.assertEqual(self.juego.get_color_jugador_actual(), 'blanco')
+      
+       self.juego.terminar_turno()
+       self.assertEqual(self.juego.get_color_jugador_actual(), 'negro')
+      
+       self.juego.terminar_turno()
+       self.assertEqual(self.juego.get_color_jugador_actual(), 'blanco')
+  
