@@ -123,3 +123,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - implementar clase BackgammonGame con inicialización y tirada de dados.
+
+#### [0.2.3] - 2024-09-25
+
+### Added
+- agregar helper _calcular_destino y validación inicial de movimientos
