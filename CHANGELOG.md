@@ -114,4 +114,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - añadir pruebas de estados y representación en Checker
 
+#### [0.2.1] - 2024-09-25
+
+### Added
+- agregar casos límite y validación de todas las posiciones (0–25)
 

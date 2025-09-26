@@ -132,3 +132,52 @@ class TestChecker(unittest.TestCase):
        for pos in posiciones:
            self.ficha_negra.set_posicion(pos)
            self.assertEqual(str(self.ficha_negra), 'N')
+
+ # ===== TESTS DE CASOS LIMITE =====
+  
+   def test_posicion_none_no_es_barra_ni_sacada(self):
+       #Una posicion None no debe considerarse barra ni sacada
+       self.ficha_blanca.set_posicion(None)
+       self.assertFalse(self.ficha_blanca.esta_en_barra())
+       self.assertFalse(self.ficha_blanca.esta_sacada())
+       self.assertIsNone(self.ficha_blanca.get_posicion())
+  
+   def test_colores_diferentes_son_diferentes(self):
+       #Fichas de colores diferentes deben tener colores diferentes
+       self.assertNotEqual(self.ficha_blanca.get_color(),
+                          self.ficha_negra.get_color())
+  
+   def test_fichas_independientes(self):
+       #Las fichas deben ser independientes entre si
+       self.ficha_blanca.set_posicion(10)
+       self.ficha_negra.set_posicion(20)
+      
+       # Cambiar una no debe afectar la otra
+       self.assertEqual(self.ficha_blanca.get_posicion(), 10)
+       self.assertEqual(self.ficha_negra.get_posicion(), 20)
+      
+       self.ficha_blanca.set_posicion(0)
+       self.assertEqual(self.ficha_negra.get_posicion(), 20)  # No cambia
+  
+   # ===== TESTS DE TODAS LAS POSICIONES VALIDAS =====
+  
+   def test_todas_las_posiciones_validas(self):
+       #Debe poder establecer cualquier posicion valida del tablero
+       posiciones_validas = list(range(0, 26))  # 0 a 25
+      
+       for pos in posiciones_validas:
+           self.ficha_blanca.set_posicion(pos)
+           self.assertEqual(self.ficha_blanca.get_posicion(), pos)
+          
+           # Verificar estados especiales
+           if pos == 0:
+               self.assertTrue(self.ficha_blanca.esta_en_barra())
+           elif pos == 25:
+               self.assertTrue(self.ficha_blanca.esta_sacada())
+           else:
+               self.assertFalse(self.ficha_blanca.esta_en_barra())
+               self.assertFalse(self.ficha_blanca.esta_sacada())
+
+
+if __name__ == "__main__":
+   unittest.main()
