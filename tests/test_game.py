@@ -143,3 +143,63 @@ class TestBackgammonGame(unittest.TestCase):
       
        # Punto 1 tiene fichas negras, jugador actual es blanco
        self.assertFalse(self.juego.puede_hacer_movimiento(1, 2))
+        
+    # ===== TESTS DE EJECUCIÃ“N DE MOVIMIENTOS =====
+  
+   @patch('core.dice.random.randint')
+   def test_hacer_movimiento_exitoso(self, mock_randint):
+       #Debe poder ejecutar movimientos validos
+       mock_randint.side_effect = [1, 2]
+       self.juego.tirar_dados()
+      
+       # Mover ficha del punto 24
+       resultado = self.juego.hacer_movimiento(24, 1)
+      
+       self.assertTrue(resultado)
+       self.assertEqual(self.juego.get_movimientos_disponibles(), [2])  # Solo queda el 2
+  
+   @patch('core.dice.random.randint')
+   def test_hacer_movimiento_invalido(self, mock_randint):
+       #Movimientos invalidos deben fallar
+       mock_randint.side_effect = [1, 2]
+       self.juego.tirar_dados()
+      
+       # Intentar mover desde punto vacio
+       resultado = self.juego.hacer_movimiento(3, 1)
+      
+       self.assertFalse(resultado)
+       self.assertEqual(self.juego.get_movimientos_disponibles(), [1, 2])  # No se consume
+  
+   @patch('core.dice.random.randint')
+   def test_movimiento_agota_dados(self, mock_randint):
+       #Usar todos los dados debe terminar el turno automaticamente
+       mock_randint.side_effect = [1, 1]  # Movimientos pequeños
+       self.juego.tirar_dados()
+      
+       # Hacer ambos movimientos
+       self.juego.hacer_movimiento(24, 1)
+       self.juego.hacer_movimiento(24, 1)
+      
+       # Debe cambiar automÃ¡ticamente al siguiente jugador
+       self.assertEqual(self.juego.get_jugador_actual(), self.juego.get_jugador2())
+  
+   # ===== TESTS DE TURNOS =====
+  
+   def test_terminar_turno_cambia_jugador(self):
+       #Terminar turno debe cambiar al otro jugador
+       jugador_inicial = self.juego.get_jugador_actual()
+      
+       self.juego.terminar_turno()
+      
+       self.assertNotEqual(self.juego.get_jugador_actual(), jugador_inicial)
+       self.assertEqual(len(self.juego.get_movimientos_disponibles()), 0)
+  
+   def test_terminar_turno_limpia_movimientos(self):
+       #Terminar turno debe limpiar movimientos disponibles
+       with patch('core.dice.random.randint', side_effect=[3, 5]):
+           self.juego.tirar_dados()
+           self.assertEqual(len(self.juego.get_movimientos_disponibles()), 2)
+          
+           self.juego.terminar_turno()
+           self.assertEqual(len(self.juego.get_movimientos_disponibles()), 0)
+  
