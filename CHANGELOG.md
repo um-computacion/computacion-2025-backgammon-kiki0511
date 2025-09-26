@@ -173,3 +173,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 -test player: pruebas iniciales de creación y atributos de Player
+
+#### [0.3.3] - 2024-09-26
+
+### Added
+-test player: gestión de fichas en barra y fichas sacadas
