@@ -193,3 +193,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 -test board:tests de inicialización y movimientos
+
+#### [0.3.7] - 2024-09-27
+
+### Added
+-test board: mover ficha, capturas, barra y reingresos
