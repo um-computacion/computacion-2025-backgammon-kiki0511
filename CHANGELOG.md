@@ -208,3 +208,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 -core/exceptions: definir clases de error específicas (movimiento invalido, punto invalido, dado invalido, juego terminado, turno incorrecto, fichas en barra, bear off invalido)
+
+#### [0.4.0] - 2024-09-29
+
+### Added
+-tests/ exceptions: Agregados tests de JuegoTerminadoError, TurnoIncorrectoError y PuntoInvalidoError

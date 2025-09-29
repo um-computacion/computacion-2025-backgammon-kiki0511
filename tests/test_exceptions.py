@@ -1,86 +1,100 @@
+import unittest
+from unittest.mock import patch
+from core.game import BackgammonGame
+from core.exceptions import *
 
 
-class BackgammonError(Exception):
-   
-   #Esta es la clase padre de todas las excepciones especÃ­ficas del juego.
-   
-   pass
-
-
-class MovimientoInvalidoError(BackgammonError):
-   """
-   Error cuando se intenta hacer un movimiento que no es valido.
+class TestExcepciones(unittest.TestCase):
   
-   Se lanza cuando:
-   - El punto origen no tiene fichas del jugador
-   - El punto destino esta bloqueado
-   - No se tiene el valor del dado disponible
-   - Se intenta mover cuando hay fichas en la barra
-   """
-   pass
-
-
-class PuntoInvalidoError(BackgammonError):
-   """
-   Error cuando se especifica un punto que no existe en el tablero.
+   def setUp(self):
+       #Configuracion inicial para cada test
+       self.juego = BackgammonGame("Jugador1", "Jugador2")
   
-   Se lanza cuando:
-   - El numero de punto es menor a 0
-   - El numero de punto es mayor a 25
-   """
-   pass
-
-
-class ValorDadoInvalidoError(BackgammonError):
-   """
-   Error cuando se especifica un valor de dado invalido.
+   # ===== TESTS DE JuegoTerminadoError =====
   
-   Se lanza cuando:
-   - El valor no esta en la lista de movimientos disponibles
-   - El valor esta fuera del rango 1-6
-   """
-   pass
-
-
-class JuegoTerminadoError(BackgammonError):
-   """
-   Error cuando se intenta hacer una accion en un juego que ya termina.
+   def test_tirar_dados_en_juego_terminado(self):
+       #No debe poder tirar dados en un juego terminado
+       # Simular juego terminado
+       self.juego._BackgammonGame__juego_terminado__ = True
+      
+       with self.assertRaises(JuegoTerminadoError) as context:
+           self.juego.tirar_dados()
+      
+       self.assertIn("juego terminado", str(context.exception))
   
-   Se lanza cuando:
-   - Se intenta tirar dados en un juego terminado
-   - Se intenta hacer movimientos cuando hay un ganador
-   """
-   pass
-
-
-class TurnoIncorrectoError(BackgammonError):
-   """
-   Error cuando se intenta hacer una accion fuera del turno correspondiente.
+   def test_hacer_movimiento_en_juego_terminado(self):
+       # No debe poder hacer movimientos en un juego terminado
+       # Simular juego terminado
+       self.juego._BackgammonGame__juego_terminado__ = True
+      
+       with self.assertRaises(JuegoTerminadoError):
+           self.juego.puede_hacer_movimiento(24, 3)
   
-   Se lanza cuando:
-   - Se intenta tirar dados cuando ya se tiraron en el turno
-   - Se intenta mover sin haber tirado dados
-   """
-   pass
-
-
-class FichaEnBarraError(BackgammonError):
-   """
-   Error cuando se intenta mover fichas del tablero teniendo fichas en la barra.
+   def test_terminar_turno_en_juego_terminado(self):
+       # No debe poder terminar turno en un juego terminado 
+       # Simular juego terminado
+       self.juego._BackgammonGame__juego_terminado__ = True
+      
+       with self.assertRaises(JuegoTerminadoError):
+           self.juego.terminar_turno()
   
-   Se lanza cuando:
-   - Se intenta mover desde un punto del tablero
-   - El jugador tiene fichas capturadas en la barra
-   """
-   pass
-
-
-class BearOffInvalidoError(BackgammonError):
-   """
-   Error cuando se intenta sacar fichas sin cumplir las condiciones.
+   def test_verificar_movimientos_en_juego_terminado(self):
+       # No debe poder verificar movimientos en un juego terminado 
+       # Simular juego terminado
+       self.juego._BackgammonGame__juego_terminado__ = True
+      
+       with self.assertRaises(JuegoTerminadoError):
+           self.juego.puede_hacer_algun_movimiento()
   
-   Se lanza cuando:
-   - Se intenta sacar fichas sin tenerlas todas en el cuadrante final
-   - Se intenta sacar fichas teniendo fichas en la barra
-   """
-   pass
+   # ===== TESTS DE TurnoIncorrectoError =====
+  
+   @patch('core.dice.random.randint')
+   def test_tirar_dados_dos_veces_mismo_turno(self, mock_randint):
+       # No debe poder tirar dados dos veces en el mismo turno
+       mock_randint.side_effect = [3, 5]
+      
+       # Primera tirada exitosa
+       self.juego.tirar_dados()
+      
+       # Segunda tirada debe fallar
+       with self.assertRaises(TurnoIncorrectoError) as context:
+           self.juego.tirar_dados()
+      
+       self.assertIn("Ya se tiraron los dados", str(context.exception))
+  
+   # ===== TESTS DE PuntoInvalidoError =====
+  
+   def test_punto_origen_negativo(self):
+       # Punto origen negativo debe lanzar excepcion
+       with self.assertRaises(PuntoInvalidoError) as context:
+           self.juego.calcular_punto_destino(-1, 3)
+      
+       self.assertIn("fuera del rango vÃ¡lido", str(context.exception))
+       self.assertIn("-1", str(context.exception))
+  
+   def test_punto_origen_mayor_a_25(self):
+       # Punto origen mayor a 25 debe lanzar excepcion
+       with self.assertRaises(PuntoInvalidoError):
+           self.juego.calcular_punto_destino(26, 3)
+  
+   def test_puede_hacer_movimiento_punto_invalido(self):
+       # Verificar movimiento con punto invalido debe lanzar excepcion
+       with patch('core.dice.random.randint', side_effect=[3, 5]):
+           self.juego.tirar_dados()
+          
+           with self.assertRaises(PuntoInvalidoError):
+               self.juego.puede_hacer_movimiento(-5, 3)
+          
+           with self.assertRaises(PuntoInvalidoError):
+               self.juego.puede_hacer_movimiento(30, 3)
+  
+   def test_validar_entrada_usuario_punto_invalido(self):
+       # Validar entrada con punto invalido debe lanzar excepcion
+       with self.assertRaises(PuntoInvalidoError):
+           self.juego.validar_entrada_usuario("-1", "3")
+      
+       with self.assertRaises(PuntoInvalidoError):
+           self.juego.validar_entrada_usuario("26", "3")
+      
+       with self.assertRaises(PuntoInvalidoError):
+           self.juego.validar_entrada_usuario("abc", "3")
