@@ -1,287 +1,484 @@
-# Board: representa el tablero.
-
-
 from core.checker import Checker
 
 
 class Board:
+    """
+    Clase que representa el tablero de Backgammon.
+    
+    Recibe: Nada
+    Hace: Crea un tablero con 26 puntos y coloca las fichas iniciales
+    Devuelve: Nada
+    """
+    
     def __init__(self):
-       # Crear 26 listas vacías (0 a 25)
-       self.__puntos__ = []
-       for _ in range(26):
-           self.__puntos__.append([])
-       # Colocar fichas en posición inicial
-       self.colocar_fichas_iniciales()
-  
+        """
+        Inicializa el tablero con 26 puntos vacios.
+        
+        Recibe: Nada
+        Hace: Crea 26 listas vacias y coloca las fichas iniciales
+        Devuelve: Nada
+        """
+        # crear 26 puntos vacios (0 es la barra, 25 es fichas sacadas)
+        self.__puntos__ = []
+        contador = 0
+        while contador < 26:
+            self.__puntos__.append([])
+            contador = contador + 1
+        
+        # colocar las fichas en posicion inicial
+        self.colocar_fichas_iniciales()
+    
     def colocar_fichas_iniciales(self):
-       #Coloca las fichas en la posición inicial del Backgammon (15 blancas y 15 negras)
-       # Fichas blancas (jugador que mueve hacia derecha)
-       # 2 fichas en punto 24
-       for _ in range(2):
-           ficha = Checker('blanco')
-           ficha.set_posicion(24)
-           self.__puntos__[24].append(ficha)
-      
-       # 5 fichas en punto 13
-       for _ in range(5):
-           ficha = Checker('blanco')
-           ficha.set_posicion(13)
-           self.__puntos__[13].append(ficha)
-      
-       # 3 fichas en punto 8
-       for _ in range(3):
-           ficha = Checker('blanco')
-           ficha.set_posicion(8)
-           self.__puntos__[8].append(ficha)
-
-         # 5 fichas en punto 6
-       for _ in range(5):
-           ficha = Checker('blanco')
-           ficha.set_posicion(6)
-           self.__puntos__[6].append(ficha)
-      
-       # Fichas negras (jugador que mueve hacia izquierda)
-       # 2 fichas en punto 1
-       for _ in range(2):
-           ficha = Checker('negro')
-           ficha.set_posicion(1)
-           self.__puntos__[1].append(ficha)
-      
-       # 5 fichas en punto 12
-       for _ in range(5):
-           ficha = Checker('negro')
-           ficha.set_posicion(12)
-           self.__puntos__[12].append(ficha)
-          # 3 fichas en punto 17
-       for _ in range(3):
-           ficha = Checker('negro')
-           ficha.set_posicion(17)
-           self.__puntos__[17].append(ficha)
-      
-       # 5 fichas en punto 19
-       for _ in range(5):
-           ficha = Checker('negro')
-           ficha.set_posicion(19)
-           self.__puntos__[19].append(ficha)
-
-def get_fichas_en_punto(self, punto):
-       
-       if punto < 0 or punto > 25:
-           return []
-       return self.__puntos__[punto]
-  
-def contar_fichas_en_punto(self, punto):
-       
-       return len(self.get_fichas_en_punto(punto))
-  
-def punto_esta_vacio(self, punto):
-       
-       return self.contar_fichas_en_punto(punto) == 0
-  
-def get_color_en_punto(self, punto):
-       
-       fichas = self.get_fichas_en_punto(punto)
-       if len(fichas) == 0:
-           return None
-       return fichas[0].get_color()
-
-def puede_mover_a_punto(self, punto, color_jugador):
-       
-       if punto < 1 or punto > 24:
-           return False
-      
-       fichas_en_punto = self.contar_fichas_en_punto(punto)
-      
-       # Punto vacío - siempre se puede mover
-       if fichas_en_punto == 0:
-           return True
-      
-       color_en_punto = self.get_color_en_punto(punto)
-      
-       # Punto propio - siempre se puede mover
-       if color_en_punto == color_jugador:
-           return True
-      
-       # Punto enemigo con 1 ficha - se puede capturar
-       if color_en_punto != color_jugador and fichas_en_punto == 1:
-           return True
-      
-       # Punto enemigo con 2 o más fichas - bloqueado
-       return False
-  
-def mover_ficha(self, punto_origen, punto_destino, color_jugador):
-       
-       # Verificar que hay fichas en el origen
-       if self.contar_fichas_en_punto(punto_origen) == 0:
-           return False
-      
-       # Verificar que la ficha es del color correcto
-       if self.get_color_en_punto(punto_origen) != color_jugador:
-           return False
-       
-         # Verificar que se puede mover al destino
-       if not self.puede_mover_a_punto(punto_destino, color_jugador):
-           return False
-      
-       # Tomar la ficha del origen
-       ficha = self.__puntos__[punto_origen].pop()
-      
-       # Verificar si hay captura
-       if (self.contar_fichas_en_punto(punto_destino) == 1 and
-           self.get_color_en_punto(punto_destino) != color_jugador):
-           # Capturar la ficha enemiga (moverla a la barra)
-           ficha_capturada = self.__puntos__[punto_destino].pop()
-           ficha_capturada.set_posicion(0)
-           self.__puntos__[0].append(ficha_capturada)
-      
-       # Mover la ficha al destino
-       ficha.set_posicion(punto_destino)
-       self.__puntos__[punto_destino].append(ficha)
-      
-       return True
-
-def reingresar_desde_barra(self, color_jugador, destino):
-       """
-       Reingresa una ficha desde la barra (punto 0) al destino segun reglas.
-       Maneja captura si hay 1 ficha enemiga.
-       """
-       if not (1 <= destino <= 24):
-           return False
-       if not self.puede_mover_a_punto(destino, color_jugador):
-           return False
-
-
-       ficha = self.sacar_ficha_de_barra(color_jugador)
-       if ficha is None:
-           return False
-
- # Captura si corresponde
-       if (self.contar_fichas_en_punto(destino) == 1 and
-           self.get_color_en_punto(destino) != color_jugador):
-           ficha_capturada = self.__puntos__[destino].pop()
-           ficha_capturada.set_posicion(0)
-           self.__puntos__[0].append(ficha_capturada)
-
-
-       ficha.set_posicion(destino)
-       self.__puntos__[destino].append(ficha)
-       return True
-  
-def jugador_tiene_fichas_en_barra(self, color_jugador):
-       #Verifica si un jugador tiene fichas en la barra (punto 0).
-       fichas_en_barra = self.get_fichas_en_punto(0)
-       for ficha in fichas_en_barra:
-           if ficha.get_color() == color_jugador:
-               return True
-       return False
-  
-def sacar_ficha_de_barra(self, color_jugador):
-       #Saca una ficha del jugador desde la barra (punto 0).
-       fichas_en_barra = self.get_fichas_en_punto(0)
-       for i in range(len(fichas_en_barra)):
-           if fichas_en_barra[i].get_color() == color_jugador:
-               return self.__puntos__[0].pop(i)
-       return None
-  
-def puede_sacar_fichas(self, color_jugador):
-       """
-       Verifica si un jugador puede empezar a sacar fichas del tablero .
-       Requiere que no tenga fichas en barra y que todas estén en el cuadrante final.
-       """
-       if self.jugador_tiene_fichas_en_barra(color_jugador):
-           return False
-      
-       # Definir cuadrante final según el color
-       if color_jugador == 'blanco':
-           cuadrante_final = range(1, 7)  # Puntos 1-6
-       else:
-           cuadrante_final = range(19, 25)  # Puntos 19-24
-
- # Verificar que no hay fichas fuera del cuadrante final
-       for punto in range(1, 25):
-           if punto not in cuadrante_final:
-               for ficha in self.get_fichas_en_punto(punto):
-                   if ficha.get_color() == color_jugador:
-                       return False
-       return True
-  
-def sacar_ficha_del_tablero(self, punto, color_jugador):
-       #Saca una ficha del tablero  moviendola al punto 25.
-       if not self.puede_sacar_fichas(color_jugador):
-           return False
-       if self.contar_fichas_en_punto(punto) == 0:
-           return False
-       if self.get_color_en_punto(punto) != color_jugador:
-           return False
-      
-       ficha = self.__puntos__[punto].pop()
-       ficha.set_posicion(25)
-       self.__puntos__[25].append(ficha)
-       return True
-  
-def contar_fichas_sacadas(self, color_jugador):
-       #Cuenta cuántas fichas sacó un jugador (punto 25).
-       fichas_sacadas = self.get_fichas_en_punto(25)
-       contador = 0
-       for ficha in fichas_sacadas:
-           if ficha.get_color() == color_jugador:
-               contador += 1
-       return contador
-
-def __str__(self):
-       """
-       Convierte el tablero a texto ASCII para mostrarlo.
-       Dibuja parte superior (13-24), BAR, parte inferior (12-1) y SACADAS.
-       """
-       resultado = "\n=== TABLERO DE BACKGAMMON ===\n"
-      
-       # Parte superior (puntos 13-24)
-       resultado += "13 14 15 16 17 18   19 20 21 22 23 24\n"
-       for fila in range(5):
-           linea = ""
-           for punto in range(13, 25):
-               fichas = self.get_fichas_en_punto(punto)
-               if fila < len(fichas):
-                   linea += " " + str(fichas[fila]) + " "
-               else:
-                   linea += " . "
-               if punto == 18:
-                   linea += " | "
-           resultado += linea + "\n"
-      
-       resultado += "                    BAR                   \n"
-      
-       # Mostrar fichas en la barra
-       fichas_barra = self.get_fichas_en_punto(0)
-       if len(fichas_barra) > 0:
-           linea_barra = "BARRA: "
-           for ficha in fichas_barra:
-               linea_barra += str(ficha) + " "
-           resultado += linea_barra + "\n"
-      
-       resultado += "                    BAR                   \n"
-      
-       # Parte inferior (puntos 12-1)
-       for fila in range(4, -1, -1):
-           linea = ""
-           for punto in range(12, 0, -1):
-               fichas = self.get_fichas_en_punto(punto)
-               if fila < len(fichas):
-                   linea += " " + str(fichas[fila]) + " "
-               else:
-                   linea += " . "
-               if punto == 7:
-                   linea += " | "
-           resultado += linea + "\n"
-      
-       resultado += "12 11 10  9  8  7    6  5  4  3  2  1\n"
-      
-       # Mostrar fichas sacadas
-       fichas_sacadas = self.get_fichas_en_punto(25)
-       if len(fichas_sacadas) > 0:
-           linea_sacadas = "SACADAS: "
-           for ficha in fichas_sacadas:
-               linea_sacadas += str(ficha) + " "
-           resultado += linea_sacadas + "\n"
-      
-       return resultado
+        """
+        Coloca las 15 fichas de cada jugador en posición inicial.
+        
+        Recibe: Nada
+        Hace: Pone las fichas blancas y negras en sus posiciones iniciales
+        Devuelve: Nada
+        """
+        # fichas blancas - 2 en punto 24
+        contador = 0
+        while contador < 2:
+            ficha = Checker('blanco')
+            ficha.set_posicion(24)
+            self.__puntos__[24].append(ficha)
+            contador = contador + 1
+        
+        # fichas blancas - 5 en punto 13
+        contador = 0
+        while contador < 5:
+            ficha = Checker('blanco')
+            ficha.set_posicion(13)
+            self.__puntos__[13].append(ficha)
+            contador = contador + 1
+        
+        # fichas blancas - 3 en punto 8
+        contador = 0
+        while contador < 3:
+            ficha = Checker('blanco')
+            ficha.set_posicion(8)
+            self.__puntos__[8].append(ficha)
+            contador = contador + 1
+        
+        # fichas blancas - 5 en punto 6
+        contador = 0
+        while contador < 5:
+            ficha = Checker('blanco')
+            ficha.set_posicion(6)
+            self.__puntos__[6].append(ficha)
+            contador = contador + 1
+        
+        # fichas negras - 2 en punto 1
+        contador = 0
+        while contador < 2:
+            ficha = Checker('negro')
+            ficha.set_posicion(1)
+            self.__puntos__[1].append(ficha)
+            contador = contador + 1
+        
+        # fichas negras - 5 en punto 12
+        contador = 0
+        while contador < 5:
+            ficha = Checker('negro')
+            ficha.set_posicion(12)
+            self.__puntos__[12].append(ficha)
+            contador = contador + 1
+        
+        # fichas negras - 3 en punto 17
+        contador = 0
+        while contador < 3:
+            ficha = Checker('negro')
+            ficha.set_posicion(17)
+            self.__puntos__[17].append(ficha)
+            contador = contador + 1
+        
+        # fichas negras - 5 en punto 19
+        contador = 0
+        while contador < 5:
+            ficha = Checker('negro')
+            ficha.set_posicion(19)
+            self.__puntos__[19].append(ficha)
+            contador = contador + 1
+    
+    def get_fichas_en_punto(self, punto):
+        """
+        Obtiene las fichas en un punto específico.
+        
+        Recibe: Número del punto (int)
+        Hace: Busca las fichas en ese punto
+        Devuelve: Lista de fichas en el punto
+        """
+        if punto < 0:
+            return []
+        if punto > 25:
+            return []
+        
+        return self.__puntos__[punto]
+    
+    def contar_fichas_en_punto(self, punto):
+        """
+        Cuenta cuántas fichas hay en un punto.
+        
+        Recibe: Número del punto (int)
+        Hace: Cuenta las fichas en ese punto
+        Devuelve: Cantidad de fichas (int)
+        """
+        fichas = self.get_fichas_en_punto(punto)
+        return len(fichas)
+    
+    def punto_esta_vacio(self, punto):
+        """
+        Verifica si un punto está vacío.
+        
+        Recibe: Número del punto (int)
+        Hace: Verifica si no hay fichas en el punto
+        Devuelve: True si está vacío, False si tiene fichas
+        """
+        cantidad = self.contar_fichas_en_punto(punto)
+        if cantidad == 0:
+            return True
+        else:
+            return False
+    
+    def get_color_en_punto(self, punto):
+        """
+        Obtiene el color de las fichas en un punto.
+        
+        Recibe: Número del punto (int)
+        Hace: Busca el color de la primera ficha
+        Devuelve: String con el color o None si está vacío
+        """
+        fichas = self.get_fichas_en_punto(punto)
+        
+        if len(fichas) == 0:
+            return None
+        
+        primera_ficha = fichas[0]
+        color = primera_ficha.get_color()
+        return color
+    
+    def puede_mover_a_punto(self, punto, color_jugador):
+        """
+        Verifica si se puede mover a un punto.
+        
+        Recibe: Número del punto (int) y color del jugador (string)
+        Hace: Verifica según las reglas si el movimiento es válido
+        Devuelve: True si puede mover, False si no puede
+        """
+        # verificar que el punto sea valido
+        if punto < 1:
+            return False
+        if punto > 24:
+            return False
+        
+        cantidad_fichas = self.contar_fichas_en_punto(punto)
+        
+        # si esta vacio, siempre se puede
+        if cantidad_fichas == 0:
+            return True
+        
+        color_punto = self.get_color_en_punto(punto)
+        
+        # si es del mismo color, siempre se puede
+        if color_punto == color_jugador:
+            return True
+        
+        # si es del color contrario y hay solo 1, se puede capturar
+        if color_punto != color_jugador:
+            if cantidad_fichas == 1:
+                return True
+        
+        # en cualquier otro caso, no se puede
+        return False
+    
+    def mover_ficha(self, punto_origen, punto_destino, color_jugador):
+        """
+        Mueve una ficha de un punto a otro.
+        
+        Recibe: Punto origen (int), punto destino (int), color jugador (string)
+        Hace: Mueve la ficha si es válido, captura si corresponde
+        Devuelve: True si movió, False si no pudo
+        """
+        # verificar que hay fichas en el origen
+        cantidad_origen = self.contar_fichas_en_punto(punto_origen)
+        if cantidad_origen == 0:
+            return False
+        
+        # verificar que la ficha es del color correcto
+        color_origen = self.get_color_en_punto(punto_origen)
+        if color_origen != color_jugador:
+            return False
+        
+        # verificar que se puede mover al destino
+        puede_mover = self.puede_mover_a_punto(punto_destino, color_jugador)
+        if puede_mover == False:
+            return False
+        
+        # sacar la ultima ficha del origen
+        ficha = self.__puntos__[punto_origen].pop()
+        
+        # verificar si hay que capturar
+        cantidad_destino = self.contar_fichas_en_punto(punto_destino)
+        color_destino = self.get_color_en_punto(punto_destino)
+        
+        if cantidad_destino == 1:
+            if color_destino != color_jugador:
+                # capturar la ficha enemiga
+                ficha_capturada = self.__puntos__[punto_destino].pop()
+                ficha_capturada.set_posicion(0)
+                self.__puntos__[0].append(ficha_capturada)
+        
+        # mover la ficha al destino
+        ficha.set_posicion(punto_destino)
+        self.__puntos__[punto_destino].append(ficha)
+        
+        return True
+    
+    def reingresar_desde_barra(self, color_jugador, destino):
+        """
+        Reingresa una ficha desde la barra al tablero.
+        
+        Recibe: Color del jugador (string) y punto destino (int)
+        Hace: Mueve una ficha de la barra al destino si es válido
+        Devuelve: True si reingresó, False si no pudo
+        """
+        # verificar que el destino es valido
+        if destino < 1:
+            return False
+        if destino > 24:
+            return False
+        
+        # verificar que se puede mover al destino
+        puede_mover = self.puede_mover_a_punto(destino, color_jugador)
+        if puede_mover == False:
+            return False
+        
+        # buscar una ficha del jugador en la barra
+        ficha = self.sacar_ficha_de_barra(color_jugador)
+        if ficha == None:
+            return False
+        
+        # verificar si hay que capturar
+        cantidad_destino = self.contar_fichas_en_punto(destino)
+        color_destino = self.get_color_en_punto(destino)
+        
+        if cantidad_destino == 1:
+            if color_destino != color_jugador:
+                # capturar la ficha enemiga
+                ficha_capturada = self.__puntos__[destino].pop()
+                ficha_capturada.set_posicion(0)
+                self.__puntos__[0].append(ficha_capturada)
+        
+        # poner la ficha en el destino
+        ficha.set_posicion(destino)
+        self.__puntos__[destino].append(ficha)
+        
+        return True
+    
+    def jugador_tiene_fichas_en_barra(self, color_jugador):
+        """
+        Verifica si el jugador tiene fichas en la barra.
+        
+        Recibe: Color del jugador (string)
+        Hace: Busca fichas del color en el punto 0 (barra)
+        Devuelve: True si tiene fichas, False si no tiene
+        """
+        fichas_barra = self.get_fichas_en_punto(0)
+        
+        i = 0
+        while i < len(fichas_barra):
+            if fichas_barra[i].get_color() == color_jugador:
+                return True
+            i = i + 1
+        
+        return False
+    
+    def sacar_ficha_de_barra(self, color_jugador):
+        """
+        Saca una ficha del jugador de la barra.
+        
+        Recibe: Color del jugador (string)
+        Hace: Busca y extrae una ficha del color de la barra
+        Devuelve: Objeto Checker si encontró, None si no hay
+        """
+        fichas_barra = self.get_fichas_en_punto(0)
+        
+        i = 0
+        while i < len(fichas_barra):
+            if fichas_barra[i].get_color() == color_jugador:
+                # sacar esta ficha de la lista
+                ficha = self.__puntos__[0].pop(i)
+                return ficha
+            i = i + 1
+        
+        return None
+    
+    def puede_sacar_fichas(self, color_jugador):
+        """
+        Verifica si el jugador puede empezar a sacar fichas del tablero.
+        
+        Recibe: Color del jugador (string)
+        Hace: Verifica que no tenga fichas en barra y todas estén en cuadrante final
+        Devuelve: True si puede sacar, False si no puede
+        """
+        # no puede sacar si tiene fichas en barra
+        if self.jugador_tiene_fichas_en_barra(color_jugador) == True:
+            return False
+        
+        # verificar que todas las fichas esten en el cuadrante final
+        if color_jugador == 'blanco':
+            # blancos deben estar en puntos 1-6
+            punto = 7
+            while punto <= 24:
+                fichas = self.get_fichas_en_punto(punto)
+                i = 0
+                while i < len(fichas):
+                    if fichas[i].get_color() == color_jugador:
+                        return False
+                    i = i + 1
+                punto = punto + 1
+        else:
+            # negros deben estar en puntos 19-24
+            punto = 1
+            while punto <= 18:
+                fichas = self.get_fichas_en_punto(punto)
+                i = 0
+                while i < len(fichas):
+                    if fichas[i].get_color() == color_jugador:
+                        return False
+                    i = i + 1
+                punto = punto + 1
+        
+        return True
+    
+    def sacar_ficha_del_tablero(self, punto, color_jugador):
+        """
+        Saca una ficha del tablero (la mueve al punto 25).
+        
+        Recibe: Punto de origen (int) y color del jugador (string)
+        Hace: Mueve la ficha al punto 25 si es válido
+        Devuelve: True si sacó la ficha, False si no pudo
+        """
+        # verificar que puede sacar fichas
+        if self.puede_sacar_fichas(color_jugador) == False:
+            return False
+        
+        # verificar que hay fichas en el punto
+        cantidad = self.contar_fichas_en_punto(punto)
+        if cantidad == 0:
+            return False
+        
+        # verificar que la ficha es del color correcto
+        color_punto = self.get_color_en_punto(punto)
+        if color_punto != color_jugador:
+            return False
+        
+        # sacar la ficha y moverla al punto 25
+        ficha = self.__puntos__[punto].pop()
+        ficha.set_posicion(25)
+        self.__puntos__[25].append(ficha)
+        
+        return True
+    
+    def contar_fichas_sacadas(self, color_jugador):
+        """
+        Cuenta cuántas fichas ha sacado un jugador.
+        
+        Recibe: Color del jugador (string)
+        Hace: Cuenta las fichas del color en el punto 25
+        Devuelve: Cantidad de fichas sacadas (int)
+        """
+        fichas_sacadas = self.get_fichas_en_punto(25)
+        
+        contador = 0
+        i = 0
+        while i < len(fichas_sacadas):
+            if fichas_sacadas[i].get_color() == color_jugador:
+                contador = contador + 1
+            i = i + 1
+        
+        return contador
+    
+    def __str__(self):
+        """
+        Convierte el tablero a texto para mostrar en consola.
+        
+        Recibe: Nada
+        Hace: Crea una representación visual del tablero
+        Devuelve: String con el tablero dibujado
+        """
+        resultado = "\n=== TABLERO DE BACKGAMMON ===\n"
+        
+        # parte superior (puntos 13-24)
+        resultado = resultado + "13 14 15 16 17 18   19 20 21 22 23 24\n"
+        
+        # dibujar 5 filas para la parte superior
+        fila = 0
+        while fila < 5:
+            linea = ""
+            punto = 13
+            while punto <= 24:
+                fichas = self.get_fichas_en_punto(punto)
+                if fila < len(fichas):
+                    linea = linea + " " + str(fichas[fila]) + " "
+                else:
+                    linea = linea + " . "
+                
+                # separador en el medio
+                if punto == 18:
+                    linea = linea + " | "
+                
+                punto = punto + 1
+            
+            resultado = resultado + linea + "\n"
+            fila = fila + 1
+        
+        # mostrar la barra
+        resultado = resultado + "                    BAR                   \n"
+        
+        # mostrar fichas en la barra si hay
+        fichas_barra = self.get_fichas_en_punto(0)
+        if len(fichas_barra) > 0:
+            linea_barra = "BARRA: "
+            i = 0
+            while i < len(fichas_barra):
+                linea_barra = linea_barra + str(fichas_barra[i]) + " "
+                i = i + 1
+            resultado = resultado + linea_barra + "\n"
+        
+        resultado = resultado + "                    BAR                   \n"
+        
+        # parte inferior (puntos 12-1)
+        fila = 4
+        while fila >= 0:
+            linea = ""
+            punto = 12
+            while punto >= 1:
+                fichas = self.get_fichas_en_punto(punto)
+                if fila < len(fichas):
+                    linea = linea + " " + str(fichas[fila]) + " "
+                else:
+                    linea = linea + " . "
+                
+                # separador en el medio
+                if punto == 7:
+                    linea = linea + " | "
+                
+                punto = punto - 1
+            
+            resultado = resultado + linea + "\n"
+            fila = fila - 1
+        
+        resultado = resultado + "12 11 10  9  8  7    6  5  4  3  2  1\n"
+        
+        # mostrar fichas sacadas si hay
+        fichas_sacadas = self.get_fichas_en_punto(25)
+        if len(fichas_sacadas) > 0:
+            linea_sacadas = "SACADAS: "
+            i = 0
+            while i < len(fichas_sacadas):
+                linea_sacadas = linea_sacadas + str(fichas_sacadas[i]) + " "
+                i = i + 1
+            resultado = resultado + linea_sacadas + "\n"
+        
+        return resultado
