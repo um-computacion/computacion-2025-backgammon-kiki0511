@@ -213,3 +213,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 -tests/ exceptions: Agregados tests de JuegoTerminadoError, TurnoIncorrectoError y PuntoInvalidoError
+
+#### [0.4.1] - 2024-09-29
+
+### Added
+-tests/ exceptions: Agregados tests de ValorDadoInvalidoError, MovimientoInvalidoError y FichaEnBarraError
