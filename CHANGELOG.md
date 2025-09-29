@@ -204,7 +204,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 -test board: agregar casos para bear off (puede_sacar_fichas y sacar_ficha_del_tablero)
 
-#### [0.3.9] - 2024-09-27
+#### [0.3.9] - 2024-09-29
 
 ### Added
 -core/exceptions: definir clases de error específicas (movimiento invalido, punto invalido, dado invalido, juego terminado, turno incorrecto, fichas en barra, bear off invalido)
