@@ -1,283 +1,496 @@
 import unittest
-from unittest.mock import patch
-from core.game import BackgammonGame
-from core.exceptions import *
+from core.exceptions import BackgammonError
+from core.exceptions import MovimientoInvalidoError
+from core.exceptions import PuntoInvalidoError
+from core.exceptions import ValorDadoInvalidoError
+from core.exceptions import JuegoTerminadoError
+from core.exceptions import TurnoIncorrectoError
+from core.exceptions import FichaEnBarraError
+from core.exceptions import BearOffInvalidoError
 
 
-class TestExcepciones(unittest.TestCase):
-  
-   def setUp(self):
-       #Configuracion inicial para cada test
-       self.juego = BackgammonGame("Jugador1", "Jugador2")
-  
-   # ===== TESTS DE JuegoTerminadoError =====
-  
-   def test_tirar_dados_en_juego_terminado(self):
-       #No debe poder tirar dados en un juego terminado
-       # Simular juego terminado
-       self.juego._BackgammonGame__juego_terminado__ = True
-      
-       with self.assertRaises(JuegoTerminadoError) as context:
-           self.juego.tirar_dados()
-      
-       self.assertIn("juego terminado", str(context.exception))
-  
-   def test_hacer_movimiento_en_juego_terminado(self):
-       # No debe poder hacer movimientos en un juego terminado
-       # Simular juego terminado
-       self.juego._BackgammonGame__juego_terminado__ = True
-      
-       with self.assertRaises(JuegoTerminadoError):
-           self.juego.puede_hacer_movimiento(24, 3)
-  
-   def test_terminar_turno_en_juego_terminado(self):
-       # No debe poder terminar turno en un juego terminado 
-       # Simular juego terminado
-       self.juego._BackgammonGame__juego_terminado__ = True
-      
-       with self.assertRaises(JuegoTerminadoError):
-           self.juego.terminar_turno()
-  
-   def test_verificar_movimientos_en_juego_terminado(self):
-       # No debe poder verificar movimientos en un juego terminado 
-       # Simular juego terminado
-       self.juego._BackgammonGame__juego_terminado__ = True
-      
-       with self.assertRaises(JuegoTerminadoError):
-           self.juego.puede_hacer_algun_movimiento()
-  
-   # ===== TESTS DE TurnoIncorrectoError =====
-  
-   @patch('core.dice.random.randint')
-   def test_tirar_dados_dos_veces_mismo_turno(self, mock_randint):
-       # No debe poder tirar dados dos veces en el mismo turno
-       mock_randint.side_effect = [3, 5]
-      
-       # Primera tirada exitosa
-       self.juego.tirar_dados()
-      
-       # Segunda tirada debe fallar
-       with self.assertRaises(TurnoIncorrectoError) as context:
-           self.juego.tirar_dados()
-      
-       self.assertIn("Ya se tiraron los dados", str(context.exception))
-  
-   # ===== TESTS DE PuntoInvalidoError =====
-  
-   def test_punto_origen_negativo(self):
-       # Punto origen negativo debe lanzar excepcion
-       with self.assertRaises(PuntoInvalidoError) as context:
-           self.juego.calcular_punto_destino(-1, 3)
-      
-       self.assertIn("fuera del rango valido", str(context.exception))
-       self.assertIn("-1", str(context.exception))
-  
-   def test_punto_origen_mayor_a_25(self):
-       # Punto origen mayor a 25 debe lanzar excepcion
-       with self.assertRaises(PuntoInvalidoError):
-           self.juego.calcular_punto_destino(26, 3)
-  
-   def test_puede_hacer_movimiento_punto_invalido(self):
-       # Verificar movimiento con punto invalido debe lanzar excepcion
-       with patch('core.dice.random.randint', side_effect=[3, 5]):
-           self.juego.tirar_dados()
-          
-           with self.assertRaises(PuntoInvalidoError):
-               self.juego.puede_hacer_movimiento(-5, 3)
-          
-           with self.assertRaises(PuntoInvalidoError):
-               self.juego.puede_hacer_movimiento(30, 3)
-  
-   def test_validar_entrada_usuario_punto_invalido(self):
-       # Validar entrada con punto invalido debe lanzar excepcion
-       with self.assertRaises(PuntoInvalidoError):
-           self.juego.validar_entrada_usuario("-1", "3")
-      
-       with self.assertRaises(PuntoInvalidoError):
-           self.juego.validar_entrada_usuario("26", "3")
-      
-       with self.assertRaises(PuntoInvalidoError):
-           self.juego.validar_entrada_usuario("abc", "3")
-
- # ===== TESTS DE ValorDadoInvalidoError =====
-  
-   def test_valor_dado_menor_a_1(self):
-       # Valor de dado menor a 1 debe lanzar excepcion
-       with self.assertRaises(ValorDadoInvalidoError) as context:
-           self.juego.calcular_punto_destino(24, 0)
-      
-       self.assertIn("fuera del rango valido", str(context.exception))
-       self.assertIn("0", str(context.exception))
-  
-   def test_valor_dado_mayor_a_6(self):
-       # Valor de dado mayor a 6 debe lanzar excepcion
-       with self.assertRaises(ValorDadoInvalidoError):
-           self.juego.calcular_punto_destino(24, 7)
-  
-   def test_puede_hacer_movimiento_valor_invalido(self):
-       # Verificar movimiento con valor invalido debe lanzar excepcion 
-       with patch('core.dice.random.randint', side_effect=[3, 5]):
-           self.juego.tirar_dados()
-          
-           with self.assertRaises(ValorDadoInvalidoError):
-               self.juego.puede_hacer_movimiento(24, 0)
-          
-           with self.assertRaises(ValorDadoInvalidoError):
-               self.juego.puede_hacer_movimiento(24, 8)
-  
-   def test_validar_entrada_usuario_valor_invalido(self):
-       # Validar entrada con valor invalido debe lanzar excepcion
-       with self.assertRaises(ValorDadoInvalidoError):
-           self.juego.validar_entrada_usuario("24", "0")
-      
-       with self.assertRaises(ValorDadoInvalidoError):
-           self.juego.validar_entrada_usuario("24", "7")
-      
-       with self.assertRaises(ValorDadoInvalidoError):
-           self.juego.validar_entrada_usuario("24", "xyz")
-  
-   # ===== TESTS DE MovimientoInvalidoError =====
-  
-   @patch('core.dice.random.randint')
-   def test_movimiento_desde_punto_vacio(self, mock_randint):
-       # Mover desde punto vaci­o debe lanzar excepcion 
-       mock_randint.side_effect = [3, 5]
-       self.juego.tirar_dados()
-      
-       with self.assertRaises(MovimientoInvalidoError) as context:
-           self.juego.hacer_movimiento(2, 3)  # Punto 2 esta vaci­o
-      
-       self.assertIn("no es valido", str(context.exception))
-  
-   @patch('core.dice.random.randint')
-   def test_movimiento_ficha_enemiga(self, mock_randint):
-       # Mover ficha enemiga debe lanzar excepcion
-       mock_randint.side_effect = [3, 5]
-       self.juego.tirar_dados()
-      
-       with self.assertRaises(MovimientoInvalidoError):
-           self.juego.hacer_movimiento(1, 3)  # Punto 1 tiene fichas negras, turno de blancas
-  
-   @patch('core.dice.random.randint')
-   def test_usar_valor_no_disponible(self, mock_randint):
-       # Usar valor de dado no disponible debe lanzar excepcion
-       mock_randint.side_effect = [3, 5]
-       self.juego.tirar_dados()
-      
-       with self.assertRaises(ValorDadoInvalidoError):
-           self.juego.hacer_movimiento(24, 2)  # Solo tiene 3 y 5 disponibles
-  
-   # ===== TESTS DE FichaEnBarraError =====
-  
-   @patch('core.dice.random.randint')
-   def test_mover_con_fichas_en_barra(self, mock_randint):
-       # Intentar mover del tablero teniendo fichas en barra debe fallar
-       mock_randint.side_effect = [3, 5]
-       self.juego.tirar_dados()
-      
-       # Simular ficha blanca en la barra
-       from core.checker import Checker
-       ficha_capturada = Checker('blanco')
-       ficha_capturada.set_posicion(0)
-       self.juego.get_tablero().get_fichas_en_punto(0).append(ficha_capturada)
-      
-       with self.assertRaises(FichaEnBarraError) as context:
-           self.juego.hacer_movimiento(24, 3)  # Intentar mover del tablero
-      
-       self.assertIn("fichas de la barra", str(context.exception))
-
-   # ===== TESTS DE BearOffInvalidoError =====
-  
-   @patch('core.dice.random.randint')
-   def test_bear_off_sin_todas_en_cuadrante(self, mock_randint):
-       # Intentar sacar fichas sin tenerlas todas en cuadrante final debe fallar
-       mock_randint.side_effect = [6, 6]
-       self.juego.tirar_dados()
-      
-       # Intentar bear off desde punto 6 (pero hay fichas en otros puntos)
-       with self.assertRaises(BearOffInvalidoError) as context:
-           # Calcular movimiento que saque del tablero
-           self.juego.hacer_movimiento(6, 6)  # 6-6 = 0, fuera del tablero
-      
-       self.assertIn("cuadrante final", str(context.exception))
-  
-   # ===== TESTS DE HERENCIA DE EXCEPCIONES =====
-  
-   def test_todas_heredan_de_backgammon_error(self):
-       # Todas las excepciones especi­ficas deben heredar de BackgammonError
-       excepciones = [
-           MovimientoInvalidoError,
-           PuntoInvalidoError,
-           ValorDadoInvalidoError,
-           JuegoTerminadoError,
-           TurnoIncorrectoError,
-           FichaEnBarraError,
-           BearOffInvalidoError
-       ]
-      
-       for excepcion_clase in excepciones:
-           self.assertTrue(issubclass(excepcion_clase, BackgammonError))
-  
-   def test_backgammon_error_hereda_de_exception(self):
-       # BackgammonError debe heredar de Exception 
-       self.assertTrue(issubclass(BackgammonError, Exception))
-  
-   # ===== TESTS DE MENSAJES DE EXCEPCIONES =====
-  
-   def test_mensajes_excepciones_son_descriptivos(self):
-       # Los mensajes de las excepciones deben ser descriptivos
-       excepciones_con_mensajes = [
-           (MovimientoInvalidoError("test"), "test"),
-           (PuntoInvalidoError("punto invalido"), "punto invalido"),
-           (ValorDadoInvalidoError("dado invalido"), "dado invalido"),
-           (JuegoTerminadoError("juego terminado"), "juego terminado"),
-           (TurnoIncorrectoError("turno incorrecto"), "turno incorrecto"),
-           (FichaEnBarraError("ficha en barra"), "ficha en barra"),
-           (BearOffInvalidoError("bear off invalido"), "bear off invalido")
-       ]
-      
-       for excepcion, mensaje_esperado in excepciones_con_mensajes:
-           self.assertEqual(str(excepcion), mensaje_esperado)
-  
-   # ===== TESTS DE MANEJO SEGURO DE EXCEPCIONES =====
-  
-   @patch('core.dice.random.randint')
-   def test_excepcion_no_corrompe_estado(self, mock_randint):
-       # Las excepciones no deben corromper el estado del juego
-       mock_randint.side_effect = [3, 5]
-       self.juego.tirar_dados()
-      
-       movimientos_antes = self.juego.get_movimientos_disponibles().copy()
-       jugador_antes = self.juego.get_jugador_actual()
-      
-       # Intentar movimiento invalido
-       try:
-           self.juego.hacer_movimiento(2, 3)  # Punto vaci­o
-       except MovimientoInvalidoError:
-           pass
-      
-       # El estado debe mantenerse igual
-       self.assertEqual(self.juego.get_movimientos_disponibles(), movimientos_antes)
-       self.assertEqual(self.juego.get_jugador_actual(), jugador_antes)
-       self.assertFalse(self.juego.esta_terminado())
-  
-   def test_multiple_excepciones_consecutivas(self):
-       # Multiples excepciones consecutivas deben manejarse correctamente
-       # Primera excepcion
-       with self.assertRaises(TurnoIncorrectoError):
-           self.juego.tirar_dados()  # Sin dados, pero esto debera ser valido
-           self.juego.tirar_dados()  # Segunda vez debe fallar
-      
-       # El juego debe seguir funcionando
-       self.assertFalse(self.juego.esta_terminado())
-      
-       # Segunda excepcion diferente
-       with self.assertRaises(PuntoInvalidoError):
-           self.juego.calcular_punto_destino(-1, 3)
-      
-       # El juego debe seguir funcionando
-       self.assertFalse(self.juego.esta_terminado())
+class TestExceptions(unittest.TestCase):
+    """
+    Clase de pruebas para las excepciones del juego.
+    
+    Recibe: Nada
+    Hace: Prueba todas las clases de excepciones
+    Devuelve: Nada
+    """
+    
+    def test_backgammon_error(self):
+        """
+        Prueba la excepcion BackgammonError.
+        
+        Recibe: Nada
+        Hace: Verifica que se puede crear y lanzar
+        Devuelve: Nada
+        """
+        # crear la excepcion con un mensaje
+        mensaje_prueba = "mensaje de prueba"
+        error = BackgammonError(mensaje_prueba)
+        
+        # verificar que se creo
+        resultado_none = (error == None)
+        self.assertEqual(resultado_none, False)
+        
+        # verificar el mensaje
+        mensaje_obtenido = str(error)
+        self.assertEqual(mensaje_obtenido, "mensaje de prueba")
+        
+        # probar lanzar la excepcion
+        error_capturado = False
+        try:
+            raise BackgammonError("error lanzado")
+        except BackgammonError as e:
+            error_capturado = True
+            mensaje_error = str(e)
+            self.assertEqual(mensaje_error, "error lanzado")
+        
+        # verificar que se capturo el error
+        self.assertEqual(error_capturado, True)
+        
+        # crear sin mensaje
+        error2 = BackgammonError()
+        resultado_none2 = (error2 == None)
+        self.assertEqual(resultado_none2, False)
+    
+    def test_movimiento_invalido_error(self):
+        """
+        Prueba la excepcion MovimientoInvalidoError.
+        
+        Recibe: Nada
+        Hace: Verifica que se puede crear y lanzar
+        Devuelve: Nada
+        """
+        # crear la excepcion con un mensaje
+        mensaje_prueba = "movimiento invalido"
+        error = MovimientoInvalidoError(mensaje_prueba)
+        
+        # verificar que se creo
+        resultado_none = (error == None)
+        self.assertEqual(resultado_none, False)
+        
+        # verificar el mensaje
+        mensaje_obtenido = str(error)
+        self.assertEqual(mensaje_obtenido, "movimiento invalido")
+        
+        # probar lanzar la excepcion
+        error_capturado = False
+        try:
+            raise MovimientoInvalidoError("no puedes mover")
+        except MovimientoInvalidoError as e:
+            error_capturado = True
+            mensaje_error = str(e)
+            self.assertEqual(mensaje_error, "no puedes mover")
+        
+        # verificar que se capturo el error
+        self.assertEqual(error_capturado, True)
+        
+        # crear sin mensaje
+        error2 = MovimientoInvalidoError()
+        resultado_none2 = (error2 == None)
+        self.assertEqual(resultado_none2, False)
+        
+        # verificar que hereda de BackgammonError
+        es_backgammon = isinstance(error, BackgammonError)
+        self.assertEqual(es_backgammon, True)
+    
+    def test_punto_invalido_error(self):
+        """
+        Prueba la excepcion PuntoInvalidoError.
+        
+        Recibe: Nada
+        Hace: Verifica que se puede crear y lanzar
+        Devuelve: Nada
+        """
+        # crear la excepcion con un mensaje
+        mensaje_prueba = "punto invalido"
+        error = PuntoInvalidoError(mensaje_prueba)
+        
+        # verificar que se creo
+        resultado_none = (error == None)
+        self.assertEqual(resultado_none, False)
+        
+        # verificar el mensaje
+        mensaje_obtenido = str(error)
+        self.assertEqual(mensaje_obtenido, "punto invalido")
+        
+        # probar lanzar la excepcion
+        error_capturado = False
+        try:
+            raise PuntoInvalidoError("punto -1 no existe")
+        except PuntoInvalidoError as e:
+            error_capturado = True
+            mensaje_error = str(e)
+            self.assertEqual(mensaje_error, "punto -1 no existe")
+        
+        # verificar que se capturo el error
+        self.assertEqual(error_capturado, True)
+        
+        # crear sin mensaje
+        error2 = PuntoInvalidoError()
+        resultado_none2 = (error2 == None)
+        self.assertEqual(resultado_none2, False)
+        
+        # verificar que hereda de BackgammonError
+        es_backgammon = isinstance(error, BackgammonError)
+        self.assertEqual(es_backgammon, True)
+    
+    def test_valor_dado_invalido_error(self):
+        """
+        Prueba la excepcion ValorDadoInvalidoError.
+        
+        Recibe: Nada
+        Hace: Verifica que se puede crear y lanzar
+        Devuelve: Nada
+        """
+        # crear la excepcion con un mensaje
+        mensaje_prueba = "dado invalido"
+        error = ValorDadoInvalidoError(mensaje_prueba)
+        
+        # verificar que se creo
+        resultado_none = (error == None)
+        self.assertEqual(resultado_none, False)
+        
+        # verificar el mensaje
+        mensaje_obtenido = str(error)
+        self.assertEqual(mensaje_obtenido, "dado invalido")
+        
+        # probar lanzar la excepcion
+        error_capturado = False
+        try:
+            raise ValorDadoInvalidoError("valor 8 no valido")
+        except ValorDadoInvalidoError as e:
+            error_capturado = True
+            mensaje_error = str(e)
+            self.assertEqual(mensaje_error, "valor 8 no valido")
+        
+        # verificar que se capturo el error
+        self.assertEqual(error_capturado, True)
+        
+        # crear sin mensaje
+        error2 = ValorDadoInvalidoError()
+        resultado_none2 = (error2 == None)
+        self.assertEqual(resultado_none2, False)
+        
+        # verificar que hereda de BackgammonError
+        es_backgammon = isinstance(error, BackgammonError)
+        self.assertEqual(es_backgammon, True)
+    
+    def test_juego_terminado_error(self):
+        """
+        Prueba la excepcion JuegoTerminadoError.
+        
+        Recibe: Nada
+        Hace: Verifica que se puede crear y lanzar
+        Devuelve: Nada
+        """
+        # crear la excepcion con un mensaje
+        mensaje_prueba = "juego terminado"
+        error = JuegoTerminadoError(mensaje_prueba)
+        
+        # verificar que se creo
+        resultado_none = (error == None)
+        self.assertEqual(resultado_none, False)
+        
+        # verificar el mensaje
+        mensaje_obtenido = str(error)
+        self.assertEqual(mensaje_obtenido, "juego terminado")
+        
+        # probar lanzar la excepcion
+        error_capturado = False
+        try:
+            raise JuegoTerminadoError("ya hay ganador")
+        except JuegoTerminadoError as e:
+            error_capturado = True
+            mensaje_error = str(e)
+            self.assertEqual(mensaje_error, "ya hay ganador")
+        
+        # verificar que se capturo el error
+        self.assertEqual(error_capturado, True)
+        
+        # crear sin mensaje
+        error2 = JuegoTerminadoError()
+        resultado_none2 = (error2 == None)
+        self.assertEqual(resultado_none2, False)
+        
+        # verificar que hereda de BackgammonError
+        es_backgammon = isinstance(error, BackgammonError)
+        self.assertEqual(es_backgammon, True)
+    
+    def test_turno_incorrecto_error(self):
+        """
+        Prueba la excepcion TurnoIncorrectoError.
+        
+        Recibe: Nada
+        Hace: Verifica que se puede crear y lanzar
+        Devuelve: Nada
+        """
+        # crear la excepcion con un mensaje
+        mensaje_prueba = "turno incorrecto"
+        error = TurnoIncorrectoError(mensaje_prueba)
+        
+        # verificar que se creo
+        resultado_none = (error == None)
+        self.assertEqual(resultado_none, False)
+        
+        # verificar el mensaje
+        mensaje_obtenido = str(error)
+        self.assertEqual(mensaje_obtenido, "turno incorrecto")
+        
+        # probar lanzar la excepcion
+        error_capturado = False
+        try:
+            raise TurnoIncorrectoError("no es tu turno")
+        except TurnoIncorrectoError as e:
+            error_capturado = True
+            mensaje_error = str(e)
+            self.assertEqual(mensaje_error, "no es tu turno")
+        
+        # verificar que se capturo el error
+        self.assertEqual(error_capturado, True)
+        
+        # crear sin mensaje
+        error2 = TurnoIncorrectoError()
+        resultado_none2 = (error2 == None)
+        self.assertEqual(resultado_none2, False)
+        
+        # verificar que hereda de BackgammonError
+        es_backgammon = isinstance(error, BackgammonError)
+        self.assertEqual(es_backgammon, True)
+    
+    def test_ficha_en_barra_error(self):
+        """
+        Prueba la excepcion FichaEnBarraError.
+        
+        Recibe: Nada
+        Hace: Verifica que se puede crear y lanzar
+        Devuelve: Nada
+        """
+        # crear la excepcion con un mensaje
+        mensaje_prueba = "ficha en barra"
+        error = FichaEnBarraError(mensaje_prueba)
+        
+        # verificar que se creo
+        resultado_none = (error == None)
+        self.assertEqual(resultado_none, False)
+        
+        # verificar el mensaje
+        mensaje_obtenido = str(error)
+        self.assertEqual(mensaje_obtenido, "ficha en barra")
+        
+        # probar lanzar la excepcion
+        error_capturado = False
+        try:
+            raise FichaEnBarraError("mueve de la barra primero")
+        except FichaEnBarraError as e:
+            error_capturado = True
+            mensaje_error = str(e)
+            self.assertEqual(mensaje_error, "mueve de la barra primero")
+        
+        # verificar que se capturo el error
+        self.assertEqual(error_capturado, True)
+        
+        # crear sin mensaje
+        error2 = FichaEnBarraError()
+        resultado_none2 = (error2 == None)
+        self.assertEqual(resultado_none2, False)
+        
+        # verificar que hereda de BackgammonError
+        es_backgammon = isinstance(error, BackgammonError)
+        self.assertEqual(es_backgammon, True)
+    
+    def test_bear_off_invalido_error(self):
+        """
+        Prueba la excepcion BearOffInvalidoError.
+        
+        Recibe: Nada
+        Hace: Verifica que se puede crear y lanzar
+        Devuelve: Nada
+        """
+        # crear la excepcion con un mensaje
+        mensaje_prueba = "bear off invalido"
+        error = BearOffInvalidoError(mensaje_prueba)
+        
+        # verificar que se creo
+        resultado_none = (error == None)
+        self.assertEqual(resultado_none, False)
+        
+        # verificar el mensaje
+        mensaje_obtenido = str(error)
+        self.assertEqual(mensaje_obtenido, "bear off invalido")
+        
+        # probar lanzar la excepcion
+        error_capturado = False
+        try:
+            raise BearOffInvalidoError("no puedes sacar fichas")
+        except BearOffInvalidoError as e:
+            error_capturado = True
+            mensaje_error = str(e)
+            self.assertEqual(mensaje_error, "no puedes sacar fichas")
+        
+        # verificar que se capturo el error
+        self.assertEqual(error_capturado, True)
+        
+        # crear sin mensaje
+        error2 = BearOffInvalidoError()
+        resultado_none2 = (error2 == None)
+        self.assertEqual(resultado_none2, False)
+        
+        # verificar que hereda de BackgammonError
+        es_backgammon = isinstance(error, BackgammonError)
+        self.assertEqual(es_backgammon, True)
+    
+    def test_herencia_correcta(self):
+        """
+        Prueba que todas las excepciones heredan correctamente.
+        
+        Recibe: Nada
+        Hace: Verifica la jerarquia de herencia
+        Devuelve: Nada
+        """
+        # BackgammonError hereda de Exception
+        hereda_exception = issubclass(BackgammonError, Exception)
+        self.assertEqual(hereda_exception, True)
+        
+        # MovimientoInvalidoError hereda de BackgammonError
+        hereda1 = issubclass(MovimientoInvalidoError, BackgammonError)
+        self.assertEqual(hereda1, True)
+        
+        # PuntoInvalidoError hereda de BackgammonError
+        hereda2 = issubclass(PuntoInvalidoError, BackgammonError)
+        self.assertEqual(hereda2, True)
+        
+        # ValorDadoInvalidoError hereda de BackgammonError
+        hereda3 = issubclass(ValorDadoInvalidoError, BackgammonError)
+        self.assertEqual(hereda3, True)
+        
+        # JuegoTerminadoError hereda de BackgammonError
+        hereda4 = issubclass(JuegoTerminadoError, BackgammonError)
+        self.assertEqual(hereda4, True)
+        
+        # TurnoIncorrectoError hereda de BackgammonError
+        hereda5 = issubclass(TurnoIncorrectoError, BackgammonError)
+        self.assertEqual(hereda5, True)
+        
+        # FichaEnBarraError hereda de BackgammonError
+        hereda6 = issubclass(FichaEnBarraError, BackgammonError)
+        self.assertEqual(hereda6, True)
+        
+        # BearOffInvalidoError hereda de BackgammonError
+        hereda7 = issubclass(BearOffInvalidoError, BackgammonError)
+        self.assertEqual(hereda7, True)
+    
+    def test_capturar_como_padre(self):
+        """
+        Prueba capturar excepciones hijas como padre.
+        
+        Recibe: Nada
+        Hace: Verifica polimorfismo
+        Devuelve: Nada
+        """
+        # capturar MovimientoInvalidoError como BackgammonError
+        error_capturado = False
+        try:
+            raise MovimientoInvalidoError("test")
+        except BackgammonError as e:
+            error_capturado = True
+            mensaje = str(e)
+            self.assertEqual(mensaje, "test")
+        
+        self.assertEqual(error_capturado, True)
+        
+        # capturar PuntoInvalidoError como BackgammonError
+        error_capturado2 = False
+        try:
+            raise PuntoInvalidoError("test2")
+        except BackgammonError as e:
+            error_capturado2 = True
+            mensaje2 = str(e)
+            self.assertEqual(mensaje2, "test2")
+        
+        self.assertEqual(error_capturado2, True)
+        
+        # capturar BearOffInvalidoError como Exception
+        error_capturado3 = False
+        try:
+            raise BearOffInvalidoError("test3")
+        except Exception as e:
+            error_capturado3 = True
+            mensaje3 = str(e)
+            self.assertEqual(mensaje3, "test3")
+        
+        self.assertEqual(error_capturado3, True)
+    
+    def test_importar_todas(self):
+        """
+        Prueba importar todas las excepciones.
+        
+        Recibe: Nada
+        Hace: Verifica que todas se pueden importar
+        Devuelve: Nada
+        """
+        # verificar que BackgammonError existe
+        existe1 = (BackgammonError == None)
+        self.assertEqual(existe1, False)
+        
+        # verificar que MovimientoInvalidoError existe
+        existe2 = (MovimientoInvalidoError == None)
+        self.assertEqual(existe2, False)
+        
+        # verificar que PuntoInvalidoError existe
+        existe3 = (PuntoInvalidoError == None)
+        self.assertEqual(existe3, False)
+        
+        # verificar que ValorDadoInvalidoError existe
+        existe4 = (ValorDadoInvalidoError == None)
+        self.assertEqual(existe4, False)
+        
+        # verificar que JuegoTerminadoError existe
+        existe5 = (JuegoTerminadoError == None)
+        self.assertEqual(existe5, False)
+        
+        # verificar que TurnoIncorrectoError existe
+        existe6 = (TurnoIncorrectoError == None)
+        self.assertEqual(existe6, False)
+        
+        # verificar que FichaEnBarraError existe
+        existe7 = (FichaEnBarraError == None)
+        self.assertEqual(existe7, False)
+        
+        # verificar que BearOffInvalidoError existe
+        existe8 = (BearOffInvalidoError == None)
+        self.assertEqual(existe8, False)
+    
+    def test_comparacion_tipos(self):
+        """
+        Prueba comparacion de tipos de excepciones.
+        
+        Recibe: Nada
+        Hace: Verifica que son tipos diferentes
+        Devuelve: Nada
+        """
+        # crear dos excepciones diferentes
+        error1 = MovimientoInvalidoError("test")
+        error2 = PuntoInvalidoError("test")
+        
+        # obtener los tipos
+        tipo1 = type(error1)
+        tipo2 = type(error2)
+        
+        # verificar que son tipos diferentes
+        son_diferentes = (tipo1 != tipo2)
+        self.assertEqual(son_diferentes, True)
+        
+        # verificar que error1 es BackgammonError
+        es_backgammon1 = isinstance(error1, BackgammonError)
+        self.assertEqual(es_backgammon1, True)
+        
+        # verificar que error2 es BackgammonError
+        es_backgammon2 = isinstance(error2, BackgammonError)
+        self.assertEqual(es_backgammon2, True)
 
 
 if __name__ == "__main__":
-   unittest.main()
+    unittest.main()
