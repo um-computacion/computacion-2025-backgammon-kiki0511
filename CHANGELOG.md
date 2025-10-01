@@ -224,6 +224,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 -tests/ exceptions: Agregados tests de BearOffInvalidoError y verificación de herencia, mensajes y consistencia del estado en excepciones
 
-#### [0.4.3] - 2024-09-29
+#### [0.4.3] - 2024-10-01
 
 ### Added
+- He creado varios Fix donde arreglo varias clases y sus respectivos test;  y ademas agrego varios Docstrings.
