@@ -182,3 +182,109 @@ class BackgammonGame:
         else:
             color = 'negro'
         return color
+def tirar_dados(self):
+        """
+        Tira los dados para el turno actual.
+        
+        Recibe:
+            nada
+        Hace:
+            tira los dados y guarda los valores
+        Devuelve:
+            list: lista con los valores de los dados
+        """
+        # tiro los dados
+        resultado = self.__dados__.tirar()
+        
+        # copio el resultado a movimientos disponibles
+        # uso copy para no modificar el original
+        self.__movimientos_disponibles__ = resultado.copy()
+        
+        return resultado
+    
+def puede_hacer_movimiento(self, punto_origen, valor_dado):
+        """
+        Verifica si un movimiento es valido.
+        
+        Recibe:
+            punto_origen (int): punto desde donde mover
+            valor_dado (int): valor del dado a usar
+        Hace:
+            chequea todas las reglas para ver si el movimiento es posible
+        Devuelve:
+            bool: True si puede hacer el movimiento, False si no
+        """
+        # primero verifico si el dado esta disponible
+        if valor_dado not in self.__movimientos_disponibles__:
+            return False
+        
+        # obtengo el color del jugador actual
+        color = self.get_color_jugador_actual()
+        
+        # obtengo el tablero
+        tablero = self.__tablero__
+        
+        # verifico si hay fichas en la barra
+        if tablero.jugador_tiene_fichas_en_barra(color) == True:
+            # si hay fichas en barra solo puedo mover desde ahi
+            if punto_origen != 0:
+                return False
+            
+            # calculo el destino desde la barra
+            if color == 'blanco':
+                destino = 25 - valor_dado
+            else:
+                destino = valor_dado
+            
+            # verifico si el destino es valido
+            if destino < 1 or destino > 24:
+                return False
+            
+            # verifico si puedo mover a ese punto
+            if tablero.puede_mover_a_punto(destino, color) == True:
+                return True
+            else:
+                return False
+        
+        # si no hay fichas en barra, verifico movimiento normal
+        
+        # verifico que haya fichas en el origen
+        if tablero.contar_fichas_en_punto(punto_origen) == 0:
+            return False
+        
+        # verifico que las fichas sean del color correcto
+        if tablero.get_color_en_punto(punto_origen) != color:
+            return False
+        
+        # calculo el destino
+        if color == 'blanco':
+            destino = punto_origen - valor_dado
+        else:
+            destino = punto_origen + valor_dado
+        
+        # verifico que el destino este dentro del tablero
+        # por ahora no implemento bear off
+        if destino < 1 or destino > 24:
+            return False
+        
+        # verifico si puedo mover al destino
+        if tablero.puede_mover_a_punto(destino, color) == True:
+            return True
+        else:
+            return False
+    
+def puede_hacer_algun_movimiento(self):
+        """
+        Verifica si el jugador actual puede hacer algun movimiento.
+        
+        Recibe:
+            nada
+        Hace:
+            chequea si hay movimientos disponibles
+        Devuelve:
+            bool: True si hay movimientos, False si no
+        """
+        if len(self.__movimientos_disponibles__) > 0:
+            return True
+        else:
+            return False
