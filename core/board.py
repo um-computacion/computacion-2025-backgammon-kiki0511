@@ -313,6 +313,25 @@ class Board:
         
         return None
     
+    def contar_fichas_en_barra(self, color_jugador):
+        """
+        Cuenta cuántas fichas del jugador hay en la barra.
+        
+        Recibe: Color del jugador (string)
+        Hace: Recorre las fichas del punto 0 y cuenta las del color
+        Devuelve: Cantidad de fichas (int)
+        """
+        fichas_barra = self.get_fichas_en_punto(0)
+        
+        contador = 0
+        i = 0
+        while i < len(fichas_barra):
+            if fichas_barra[i].get_color() == color_jugador:
+                contador = contador + 1
+            i = i + 1
+        
+        return contador
+    
     def puede_sacar_fichas(self, color_jugador):
         """
         Verifica si el jugador puede empezar a sacar fichas del tablero.

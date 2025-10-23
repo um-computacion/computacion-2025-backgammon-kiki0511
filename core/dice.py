@@ -12,7 +12,7 @@ class Dice:
     
     def __init__(self):
         """
-        Inicializa los dados.
+        Inicializa los dados. 
         
         Recibe: Nada
         Hace: Crea el atributo para guardar la última tirada

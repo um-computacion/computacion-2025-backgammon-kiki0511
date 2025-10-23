@@ -6,216 +6,237 @@ from core.dice import Dice
 class BackgammonGame:
     """
     Clase principal del juego de Backgammon.
-    Maneja todo el flujo del juego y los turnos.
-    """
     
+    Recibe:
+        Nada directamente (se usa en __init__).
+    Hace:
+        Maneja todo el flujo del juego, los turnos y las reglas.
+    Devuelve:
+        Nada (es una clase).
+    """
+
     def __init__(self, nombre_jugador1, nombre_jugador2):
         """
-        Inicializa un nuevo juego de Backgammon.
+        Crea un nuevo juego de Backgammon con dos jugadores.
         
         Recibe:
             nombre_jugador1 (str): nombre del primer jugador
             nombre_jugador2 (str): nombre del segundo jugador
         Hace:
-            crea el tablero, los jugadores y prepara el juego
+            Crea el tablero, los jugadores, los dados y prepara todo para jugar.
         Devuelve:
-            nada (es el constructor)
+            Nada (es el constructor).
         """
         # creo el tablero del juego
         self.__tablero__ = Board()
         
-        # creo el primer jugador (fichas blancas, direccion 1)
+        # creo el primer jugador con fichas blancas (direccion 1)
         self.__jugador1__ = Player(nombre_jugador1, 1)
         
-        # creo el segundo jugador (fichas negras, direccion -1)  
+        # creo el segundo jugador con fichas negras (direccion -1)
         self.__jugador2__ = Player(nombre_jugador2, -1)
         
-        # el jugador 1 empieza primero
+        # el jugador 1 empieza jugando primero
         self.__jugador_actual__ = self.__jugador1__
         
-        # creo los dados
+        # creo los dados para tirar
         self.__dados__ = Dice()
         
-        # lista vacia para guardar los movimientos disponibles
+        # lista vacia para guardar los valores de dados que puedo usar
         self.__movimientos_disponibles__ = []
         
-        # el juego no esta terminado al principio
+        # al principio el juego no esta terminado
         self.__juego_terminado__ = False
         
-        # todavia no hay ganador
+        # al principio no hay ganador
         self.__ganador__ = None
         
-        # variable para saber si el turno paso automaticamente
+        # variable para saber si el turno cambio solo
         self.__turno_paso_automatico__ = False
 
     def get_tablero(self):
         """
-        Obtiene el tablero del juego.
+        Devuelve el tablero del juego.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            devuelve el tablero
+            Obtiene el tablero actual.
         Devuelve:
-            Board: el tablero actual del juego
+            Board: el tablero del juego.
         """
         return self.__tablero__
-    
+
     def get_jugador_actual(self):
         """
-        Obtiene el jugador que esta jugando ahora.
+        Devuelve el jugador que esta jugando ahora.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            devuelve el jugador actual
+            Obtiene el jugador que tiene el turno actual.
         Devuelve:
-            Player: el jugador actual
+            Player: el jugador actual.
         """
         return self.__jugador_actual__
-    
+
     def get_jugador1(self):
         """
-        Obtiene el jugador 1.
+        Devuelve el primer jugador.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            devuelve el jugador 1
+            Obtiene el jugador 1.
         Devuelve:
-            Player: el primer jugador
+            Player: el primer jugador.
         """
         return self.__jugador1__
-    
+
     def get_jugador2(self):
         """
-        Obtiene el jugador 2.
+        Devuelve el segundo jugador.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            devuelve el jugador 2
+            Obtiene el jugador 2.
         Devuelve:
-            Player: el segundo jugador
+            Player: el segundo jugador.
         """
         return self.__jugador2__
-    
+
     def get_dados(self):
         """
-        Obtiene los dados del juego.
+        Devuelve los dados del juego.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            devuelve los dados
+            Obtiene los dados.
         Devuelve:
-            Dice: los dados del juego
+            Dice: los dados del juego.
         """
         return self.__dados__
-    
+
     def get_movimientos_disponibles(self):
         """
-        Obtiene los movimientos disponibles.
+        Devuelve la lista de movimientos disponibles.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            devuelve la lista de movimientos
+            Obtiene los valores de dados que todavia no se usaron.
         Devuelve:
-            list: lista con los valores de dados disponibles
+            list: lista con los valores de dados disponibles.
         """
         return self.__movimientos_disponibles__
-    
+
     def esta_terminado(self):
         """
         Verifica si el juego termino.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            chequea si el juego esta terminado
+            Chequea si el juego ya tiene un ganador.
         Devuelve:
-            bool: True si termino, False si no
+            bool: True si el juego termino, False si todavia se esta jugando.
         """
         return self.__juego_terminado__
-    
+
     def get_ganador(self):
         """
-        Obtiene el ganador del juego.
+        Devuelve el ganador del juego.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            devuelve el ganador si hay
+            Obtiene el jugador que gano (si hay).
         Devuelve:
-            Player: el jugador ganador o None si no hay
+            Player: el jugador ganador, o None si no hay ganador todavia.
         """
         return self.__ganador__
-    
+
     def turno_paso_automaticamente(self):
         """
         Verifica si el turno paso automaticamente.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            chequea si el turno paso solo
+            Chequea si el turno cambio solo porque no habia movimientos.
         Devuelve:
-            bool: True si paso automaticamente
+            bool: True si el turno paso automaticamente, False si no.
         """
         return self.__turno_paso_automatico__
-    
+
     def get_color_jugador_actual(self):
         """
-        Obtiene el color del jugador actual.
+        Devuelve el color del jugador que esta jugando.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            determina el color segun la direccion
+            Obtiene el color segun la direccion del jugador actual.
         Devuelve:
-            str: 'blanco' o 'negro'
+            str: 'blanco' si direccion es 1, 'negro' si direccion es -1.
         """
-        # si la direccion es 1 es blanco, si no es negro
-        if self.__jugador_actual__.get_direccion() == 1:
+        # obtengo la direccion del jugador actual
+        direccion_jugador = self.__jugador_actual__.get_direccion()
+        
+        # si la direccion es 1, el jugador tiene fichas blancas
+        if direccion_jugador == 1:
             color = 'blanco'
         else:
+            # si no es 1, entonces es -1 y tiene fichas negras
             color = 'negro'
+        
         return color
-def tirar_dados(self):
+
+    def tirar_dados(self):
         """
-        Tira los dados para el turno actual.
+        Tira los dados para empezar un turno.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            tira los dados y guarda los valores
+            Tira los dados y guarda los valores como movimientos disponibles.
         Devuelve:
-            list: lista con los valores de los dados
+            list: lista con los valores que salieron en los dados.
         """
         # tiro los dados
-        resultado = self.__dados__.tirar()
+        resultado_dados = self.__dados__.tirar()
         
-        # copio el resultado a movimientos disponibles
-        # uso copy para no modificar el original
-        self.__movimientos_disponibles__ = resultado.copy()
+        # copio los valores a movimientos disponibles (hago una lista nueva)
+        self.__movimientos_disponibles__ = []
+        for valor in resultado_dados:
+            self.__movimientos_disponibles__.append(valor)
         
-        return resultado
-    
-def puede_hacer_movimiento(self, punto_origen, valor_dado):
+        return resultado_dados
+
+    def puede_hacer_movimiento(self, punto_origen, valor_dado):
         """
-        Verifica si un movimiento es valido.
+        Verifica si un movimiento es valido segun las reglas.
         
         Recibe:
-            punto_origen (int): punto desde donde mover
-            valor_dado (int): valor del dado a usar
+            punto_origen (int): punto desde donde quiero mover (0 significa barra)
+            valor_dado (int): valor del dado que quiero usar
         Hace:
-            chequea todas las reglas para ver si el movimiento es posible
+            Chequea todas las reglas: dado disponible, fichas en barra, 
+            color correcto, destino valido.
         Devuelve:
-            bool: True si puede hacer el movimiento, False si no
+            bool: True si el movimiento es valido, False si no lo es.
         """
-        # primero verifico si el dado esta disponible
-        if valor_dado not in self.__movimientos_disponibles__:
+        # primero verifico si tengo ese dado disponible
+        dado_disponible = False
+        for dado in self.__movimientos_disponibles__:
+            if dado == valor_dado:
+                dado_disponible = True
+                break
+        
+        # si no tengo el dado, no puedo mover
+        if dado_disponible == False:
             return False
         
         # obtengo el color del jugador actual
@@ -224,227 +245,353 @@ def puede_hacer_movimiento(self, punto_origen, valor_dado):
         # obtengo el tablero
         tablero = self.__tablero__
         
-        # verifico si hay fichas en la barra
-        if tablero.jugador_tiene_fichas_en_barra(color) == True:
-            # si hay fichas en barra solo puedo mover desde ahi
+        # verifico si tengo fichas en la barra
+        tiene_fichas_en_barra = tablero.jugador_tiene_fichas_en_barra(color)
+        
+        # si tengo fichas en la barra, solo puedo mover desde la barra
+        if tiene_fichas_en_barra == True:
+            # si intento mover desde otro punto que no sea la barra, es invalido
             if punto_origen != 0:
                 return False
             
-            # calculo el destino desde la barra
+            # calculo a donde iria desde la barra
             if color == 'blanco':
+                # blanco entra por arriba (25 - dado)
                 destino = 25 - valor_dado
             else:
+                # negro entra por abajo (dado)
                 destino = valor_dado
             
-            # verifico si el destino es valido
+            # verifico que el destino este dentro del tablero
             if destino < 1 or destino > 24:
                 return False
             
             # verifico si puedo mover a ese punto
-            if tablero.puede_mover_a_punto(destino, color) == True:
+            puedo_mover_ahi = tablero.puede_mover_a_punto(destino, color)
+            
+            if puedo_mover_ahi == True:
                 return True
             else:
                 return False
         
-        # si no hay fichas en barra, verifico movimiento normal
+        # si llego aca es un movimiento normal (no desde barra)
         
-        # verifico que haya fichas en el origen
-        if tablero.contar_fichas_en_punto(punto_origen) == 0:
+        # verifico que haya fichas en el punto de origen
+        cantidad_fichas_origen = tablero.contar_fichas_en_punto(punto_origen)
+        if cantidad_fichas_origen == 0:
             return False
         
-        # verifico que las fichas sean del color correcto
-        if tablero.get_color_en_punto(punto_origen) != color:
+        # verifico que las fichas sean de mi color
+        color_origen = tablero.get_color_en_punto(punto_origen)
+        if color_origen != color:
             return False
         
-        # calculo el destino
+        # calculo el punto de destino
         if color == 'blanco':
+            # blanco se mueve hacia abajo (resta)
             destino = punto_origen - valor_dado
         else:
+            # negro se mueve hacia arriba (suma)
             destino = punto_origen + valor_dado
         
         # verifico que el destino este dentro del tablero
-        # por ahora no implemento bear off
         if destino < 1 or destino > 24:
             return False
         
-        # verifico si puedo mover al destino
-        if tablero.puede_mover_a_punto(destino, color) == True:
+        # verifico si puedo mover a ese punto
+        puedo_mover_ahi = tablero.puede_mover_a_punto(destino, color)
+        
+        if puedo_mover_ahi == True:
             return True
         else:
             return False
-    
-def puede_hacer_algun_movimiento(self):
+
+    def puede_hacer_algun_movimiento(self):
         """
-        Verifica si el jugador actual puede hacer algun movimiento.
+        Verifica si el jugador puede hacer al menos un movimiento.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            chequea si hay movimientos disponibles
+            Chequea todos los movimientos posibles con los dados disponibles.
         Devuelve:
-            bool: True si hay movimientos, False si no
+            bool: True si hay al menos un movimiento valido, False si no.
         """
-        if len(self.__movimientos_disponibles__) > 0:
-            return True
-        else:
+        # si no tengo dados disponibles, no puedo mover
+        if len(self.__movimientos_disponibles__) == 0:
             return False
         
-        def hacer_movimiento(self, punto_origen, valor_dado):
-         """  Ejecuta un movimiento en el tablero.
+        # obtengo el color del jugador actual
+        color = self.get_color_jugador_actual()
+        
+        # obtengo el tablero
+        tablero = self.__tablero__
+        
+        # verifico si tengo fichas en la barra
+        tiene_fichas_en_barra = tablero.jugador_tiene_fichas_en_barra(color)
+        
+        # pruebo cada dado disponible
+        for dado in self.__movimientos_disponibles__:
+            # si tengo fichas en la barra, solo puedo mover desde ahi
+            if tiene_fichas_en_barra == True:
+                # verifico si puedo mover desde la barra con este dado
+                if self.puede_hacer_movimiento(0, dado) == True:
+                    return True
+            else:
+                # no tengo fichas en la barra, pruebo todos los puntos
+                for punto in range(1, 25):
+                    # verifico si puedo mover desde este punto
+                    if self.puede_hacer_movimiento(punto, dado) == True:
+                        return True
+        
+        # si llego aca, no encontre ningun movimiento valido
+        return False
+
+    def hacer_movimiento(self, punto_origen, valor_dado):
+        """
+        Ejecuta un movimiento en el tablero.
         
         Recibe:
-            punto_origen (int): punto desde donde mover
-            valor_dado (int): valor del dado a usar
+            punto_origen (int): punto desde donde mover (0 significa barra)
+            valor_dado (int): valor del dado que quiero usar
         Hace:
-            mueve la ficha si es posible y actualiza el estado
+            Verifica que sea valido, mueve la ficha, consume el dado usado,
+            y cambia el turno si no quedan mas dados.
         Devuelve:
-            bool: True si el movimiento se hizo, False si no
+            bool: True si el movimiento se hizo exitosamente, False si no.
         """
-        # obtengo el color del jugador
+        # obtengo el color del jugador actual
         color = self.get_color_jugador_actual()
         
         # obtengo el tablero
         tablero = self.__tablero__
         
         # primero verifico si el movimiento es valido
-        if self.puede_hacer_movimiento(punto_origen, valor_dado) == False:
+        movimiento_valido = self.puede_hacer_movimiento(punto_origen, valor_dado)
+        if movimiento_valido == False:
             return False
         
-        # calculo el destino
+        # calculo el punto de destino
         if punto_origen == 0:
-            # movimiento desde la barra
+            # estoy moviendo desde la barra
             if color == 'blanco':
                 destino = 25 - valor_dado
             else:
                 destino = valor_dado
         else:
-            # movimiento normal
+            # estoy moviendo desde un punto normal
             if color == 'blanco':
                 destino = punto_origen - valor_dado
             else:
                 destino = punto_origen + valor_dado
         
-        # ejecuto el movimiento
+        # ejecuto el movimiento en el tablero
         if punto_origen == 0:
-            # reingreso desde la barra
-            ok = tablero.reingresar_desde_barra(color, destino)
-            if ok == False:
-                return False
+            # es un reingreso desde la barra
+            movimiento_exitoso = tablero.reingresar_desde_barra(color, destino)
         else:
-            # movimiento normal
-            ok = tablero.mover_ficha(punto_origen, destino, color)
-            if ok == False:
-                return False
+            # es un movimiento normal
+            movimiento_exitoso = tablero.mover_ficha(punto_origen, destino, color)
         
-        # quito el dado usado de los disponibles
-        # busco el valor en la lista
-        indice = 0
-        encontrado = False
-        while indice < len(self.__movimientos_disponibles__):
-            if self.__movimientos_disponibles__[indice] == valor_dado:
-                encontrado = True
+        # si el movimiento no se pudo hacer, devuelvo False
+        if movimiento_exitoso == False:
+            return False
+        
+        # el movimiento se hizo, ahora consumo el dado usado
+        # busco el dado en la lista y lo saco
+        indice_encontrado = -1
+        for i in range(len(self.__movimientos_disponibles__)):
+            valor_actual = self.__movimientos_disponibles__[i]
+            if valor_actual == valor_dado:
+                indice_encontrado = i
                 break
-            indice = indice + 1
         
-        # si lo encontre lo elimino
-        if encontrado == True:
-            self.__movimientos_disponibles__.pop(indice)
+        # si encontre el dado, lo saco de la lista
+        if indice_encontrado >= 0:
+            self.__movimientos_disponibles__.pop(indice_encontrado)
         
-        # verifico si quedan movimientos
-        if len(self.__movimientos_disponibles__) == 0:
-            # no quedan movimientos, cambio el turno
+        # verifico si ya no quedan dados disponibles
+        cantidad_dados_restantes = len(self.__movimientos_disponibles__)
+        if cantidad_dados_restantes == 0:
+            # si no quedan dados, termino el turno
             self.terminar_turno()
         
         return True
-    
-def terminar_turno(self):
+
+    def terminar_turno(self):
         """
         Termina el turno actual y pasa al siguiente jugador.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            cambia el jugador actual y limpia los movimientos
+            Cambia al otro jugador, limpia dados y verifica victoria.
         Devuelve:
-            nada
+            Nada.
         """
-        # cambio el jugador actual
-        if self.__jugador_actual__ == self.__jugador1__:
-            self.__jugador_actual__ = self.__jugador2__
-        else:
-            self.__jugador_actual__ = self.__jugador1__
+        # primero verifico si alguien gano
+        self.verificar_victoria()
         
-        # limpio los movimientos disponibles
+        # si el juego no termino, cambio de jugador
+        if self.__juego_terminado__ == False:
+            # verifico quien es el jugador actual y cambio al otro
+            if self.__jugador_actual__ == self.__jugador1__:
+                # si era el jugador 1, paso al jugador 2
+                self.__jugador_actual__ = self.__jugador2__
+            else:
+                # si era el jugador 2, paso al jugador 1
+                self.__jugador_actual__ = self.__jugador1__
+        
+        # limpio la lista de movimientos disponibles
         self.__movimientos_disponibles__ = []
-    
-def verificar_victoria(self):
+        
+        # reseteo el flag de turno automatico
+        self.__turno_paso_automatico__ = False
+
+    def verificar_victoria(self):
         """
-        Verifica si alguien gano el juego.
+        Verifica si algun jugador gano el juego.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            chequea las condiciones de victoria
+            Chequea si algun jugador saco todas sus fichas.
         Devuelve:
-            nada
+            Nada.
         """
-        # por ahora no implementado
-        pass
-    
-def get_estado_juego(self):
+        # obtengo el tablero
+        tablero = self.__tablero__
+        
+        # verifico si el jugador 1 (blanco) gano
+        fichas_blancas_en_tablero = 0
+        fichas_blancas_en_barra = tablero.contar_fichas_en_barra('blanco')
+        
+        # cuento las fichas blancas en todos los puntos
+        for punto in range(1, 25):
+            color_punto = tablero.get_color_en_punto(punto)
+            if color_punto == 'blanco':
+                cantidad = tablero.contar_fichas_en_punto(punto)
+                fichas_blancas_en_tablero = fichas_blancas_en_tablero + cantidad
+        
+        # sumo las fichas en la barra
+        total_fichas_blancas = fichas_blancas_en_tablero + fichas_blancas_en_barra
+        
+        # si no tiene fichas, gano
+        if total_fichas_blancas == 0:
+            self.__juego_terminado__ = True
+            self.__ganador__ = self.__jugador1__
+            return
+        
+        # verifico si el jugador 2 (negro) gano
+        fichas_negras_en_tablero = 0
+        fichas_negras_en_barra = tablero.contar_fichas_en_barra('negro')
+        
+        # cuento las fichas negras en todos los puntos
+        for punto in range(1, 25):
+            color_punto = tablero.get_color_en_punto(punto)
+            if color_punto == 'negro':
+                cantidad = tablero.contar_fichas_en_punto(punto)
+                fichas_negras_en_tablero = fichas_negras_en_tablero + cantidad
+        
+        # sumo las fichas en la barra
+        total_fichas_negras = fichas_negras_en_tablero + fichas_negras_en_barra
+        
+        # si no tiene fichas, gano
+        if total_fichas_negras == 0:
+            self.__juego_terminado__ = True
+            self.__ganador__ = self.__jugador2__
+
+    def pasar_turno_si_no_hay_movimientos(self):
         """
-        Obtiene el estado actual del juego.
+        Pasa el turno automaticamente si no hay movimientos disponibles.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            recopila toda la informacion del estado actual
+            Verifica si puede hacer algun movimiento y si no, pasa el turno.
         Devuelve:
-            dict: diccionario con el estado del juego
+            bool: True si el turno paso automaticamente, False si no.
         """
-        # creo un diccionario con el estado
+        # verifico si puedo hacer algun movimiento
+        puedo_mover = self.puede_hacer_algun_movimiento()
+        
+        # si no puedo mover, paso el turno automaticamente
+        if puedo_mover == False:
+            self.__turno_paso_automatico__ = True
+            self.terminar_turno()
+            return True
+        
+        # si puedo mover, no paso el turno
+        return False
+
+    def get_estado_juego(self):
+        """
+        Devuelve el estado actual del juego.
+        
+        Recibe:
+            Nada.
+        Hace:
+            Recopila toda la informacion del estado actual en un diccionario.
+        Devuelve:
+            dict: diccionario con el estado del juego (jugador actual, color,
+                  movimientos disponibles, si termino, ganador).
+        """
+        # creo un diccionario vacio para guardar el estado
         estado = {}
         
-        # agrego el nombre del jugador actual
-        estado['jugador_actual'] = self.__jugador_actual__.get_nombre()
+        # guardo el nombre del jugador actual
+        nombre_actual = self.__jugador_actual__.get_nombre()
+        estado['jugador_actual'] = nombre_actual
         
-        # agrego el color del jugador actual
-        estado['color_actual'] = self.get_color_jugador_actual()
+        # guardo el color del jugador actual
+        color_actual = self.get_color_jugador_actual()
+        estado['color_actual'] = color_actual
         
-        # agrego los movimientos disponibles (hago copia)
-        estado['movimientos_disponibles'] = self.__movimientos_disponibles__.copy()
+        # guardo una copia de los movimientos disponibles
+        movimientos_copia = []
+        for movimiento in self.__movimientos_disponibles__:
+            movimientos_copia.append(movimiento)
+        estado['movimientos_disponibles'] = movimientos_copia
         
-        # agrego si el juego termino
+        # guardo si el juego esta terminado
         estado['juego_terminado'] = self.__juego_terminado__
         
-        # agrego el ganador si hay
+        # guardo el ganador (si hay)
         if self.__ganador__ != None:
-            estado['ganador'] = self.__ganador__.get_nombre()
+            nombre_ganador = self.__ganador__.get_nombre()
+            estado['ganador'] = nombre_ganador
         else:
             estado['ganador'] = None
         
+        # guardo si el turno paso automaticamente
+        estado['turno_paso_automatico'] = self.__turno_paso_automatico__
+        
         return estado
-    
-def __str__(self):
+
+    def __str__(self):
         """
-        Representacion en texto del juego.
+        Crea una representacion en texto del juego.
         
         Recibe:
-            nada
+            Nada.
         Hace:
-            crea una representacion en texto del juego
+            Genera un string con los nombres de los jugadores y el tablero.
         Devuelve:
-            str: texto con los jugadores y el tablero
+            str: texto que representa el estado del juego.
         """
-        # creo el encabezado con los nombres
-        texto_jugador1 = self.__jugador1__.get_nombre()
-        texto_jugador2 = self.__jugador2__.get_nombre()
-        encabezado = "Backgammon: " + texto_jugador1 + " vs " + texto_jugador2
+        # obtengo el nombre del jugador 1
+        nombre_jugador1 = self.__jugador1__.get_nombre()
         
-        # obtengo el texto del tablero
+        # obtengo el nombre del jugador 2
+        nombre_jugador2 = self.__jugador2__.get_nombre()
+        
+        # creo el encabezado con los nombres
+        encabezado = "Backgammon: " + nombre_jugador1 + " vs " + nombre_jugador2
+        
+        # obtengo la representacion del tablero
         texto_tablero = str(self.__tablero__)
         
-        # junto todo
+        # uno todo con un salto de linea
         texto_completo = encabezado + "\n" + texto_tablero
         
         return texto_completo
