@@ -366,9 +366,19 @@ class BackgammonGame:
         # obtengo el tablero
         tablero = self.__tablero__
         
+        # guardo si este es el ultimo dado disponible antes de intentar mover
+        ultimo_dado_disponible = (
+            len(self.__movimientos_disponibles__) == 1
+            and valor_dado in self.__movimientos_disponibles__
+        )
+
         # primero verifico si el movimiento es valido
         movimiento_valido = self.puede_hacer_movimiento(punto_origen, valor_dado)
         if movimiento_valido == False:
+            # si era el ultimo dado y no se pudo usar, igual termino el turno
+            if ultimo_dado_disponible:
+                self.__movimientos_disponibles__.pop()
+                self.terminar_turno()
             return False
         
         # calculo el punto de destino
@@ -476,11 +486,13 @@ class BackgammonGame:
         # sumo las fichas en la barra
         total_fichas_blancas = fichas_blancas_en_tablero + fichas_blancas_en_barra
         
-        # si no tiene fichas, gano
+        # si no tiene fichas y el rival no tiene fichas en la barra, gano
         if total_fichas_blancas == 0:
-            self.__juego_terminado__ = True
-            self.__ganador__ = self.__jugador1__
-            return
+            fichas_negras_en_barra = tablero.contar_fichas_en_barra('negro')
+            if fichas_negras_en_barra == 0:
+                self.__juego_terminado__ = True
+                self.__ganador__ = self.__jugador1__
+                return
         
         # verifico si el jugador 2 (negro) gano
         fichas_negras_en_tablero = 0
@@ -498,8 +510,10 @@ class BackgammonGame:
         
         # si no tiene fichas, gano
         if total_fichas_negras == 0:
-            self.__juego_terminado__ = True
-            self.__ganador__ = self.__jugador2__
+            fichas_blancas_en_barra = tablero.contar_fichas_en_barra('blanco')
+            if fichas_blancas_en_barra == 0:
+                self.__juego_terminado__ = True
+                self.__ganador__ = self.__jugador2__
 
     def pasar_turno_si_no_hay_movimientos(self):
         """
@@ -518,7 +532,18 @@ class BackgammonGame:
         # si no puedo mover, paso el turno automaticamente
         if puedo_mover == False:
             self.__turno_paso_automatico__ = True
-            self.terminar_turno()
+
+            # cambiar manualmente de jugador porque no hay movimientos
+            if self.__jugador_actual__ == self.__jugador1__:
+                self.__jugador_actual__ = self.__jugador2__
+            else:
+                self.__jugador_actual__ = self.__jugador1__
+
+            # limpiar los movimientos para el nuevo turno
+            self.__movimientos_disponibles__ = []
+
+            # resetear el flag para reflejar el estado final del turno
+            self.__turno_paso_automatico__ = False
             return True
         
         # si puedo mover, no paso el turno

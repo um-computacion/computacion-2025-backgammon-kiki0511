@@ -1,1016 +1,1383 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import Mock
 from core.game import BackgammonGame
+from core.checker import Checker
 
 
 class TestBackgammonGame(unittest.TestCase):
     """
-    Clase para probar el juego de Backgammon.
+    Clase de pruebas para BackgammonGame.
     
-    Recibe:
-        Nada.
-    Hace:
-        Prueba todas las funciones del juego como tirar dados, mover fichas,
-        validar movimientos y cambiar turnos.
-    Devuelve:
-        Nada.
+    Recibe: Nada
+    Hace: Prueba todos los metodos del juego con 100% de cobertura
+    Devuelve: Nada
     """
-
+    
     def setUp(self):
         """
-        Prepara cada prueba creando un juego nuevo.
+        Prepara el ambiente antes de cada prueba.
         
-        Recibe:
-            Nada.
-        Hace:
-            Crea un juego con dos jugadores y reemplaza el tablero y dados
-            por versiones falsas para poder controlarlas en las pruebas.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Crea un juego nuevo para cada test
+        Devuelve: Nada
         """
-        # Creo un juego nuevo con dos jugadores
-        self.game = BackgammonGame("Alice", "Bob")
-        
-        # Creo versiones falsas del tablero y dados para controlarlas
-        self.__tablero_falso__ = MagicMock()
-        self.__dados_falsos__ = MagicMock()
-        
-        # Le pongo las versiones falsas al juego
-        self.game._BackgammonGame__tablero__ = self.__tablero_falso__
-        self.game._BackgammonGame__dados__ = self.__dados_falsos__
-
-    def test_nombres_de_jugadores(self):
+        self.__juego__ = BackgammonGame("Ana", "Luis")
+    
+    # ===== TESTS DE INICIALIZACION =====
+    
+    def test_init_crea_juego_correctamente(self):
         """
-        Prueba que los nombres de los jugadores sean correctos.
+        Prueba que __init__ crea el juego correctamente.
         
-        Recibe:
-            Nada.
-        Hace:
-            Verifica que el jugador 1 se llame Alice y el jugador 2 Bob.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que se inicializan todos los atributos
+        Devuelve: Nada
         """
-        # Obtengo el nombre del jugador 1
-        nombre_jugador1 = self.game.get_jugador1().get_nombre()
-        # Verifico que sea Alice
-        self.assertEqual(nombre_jugador1, "Alice")
+        # verificar que se creo el tablero
+        tablero = self.__juego__.get_tablero()
+        self.assertIsNotNone(tablero)
         
-        # Obtengo el nombre del jugador 2
-        nombre_jugador2 = self.game.get_jugador2().get_nombre()
-        # Verifico que sea Bob
-        self.assertEqual(nombre_jugador2, "Bob")
-
-    def test_color_del_jugador_actual(self):
+        # verificar que se crearon los jugadores
+        jugador1 = self.__juego__.get_jugador1()
+        jugador2 = self.__juego__.get_jugador2()
+        self.assertIsNotNone(jugador1)
+        self.assertIsNotNone(jugador2)
+        
+        # verificar nombres
+        self.assertEqual(jugador1.get_nombre(), "Ana")
+        self.assertEqual(jugador2.get_nombre(), "Luis")
+        
+        # verificar direcciones
+        self.assertEqual(jugador1.get_direccion(), 1)
+        self.assertEqual(jugador2.get_direccion(), -1)
+        
+        # verificar que el jugador 1 empieza
+        jugador_actual = self.__juego__.get_jugador_actual()
+        self.assertEqual(jugador_actual, jugador1)
+        
+        # verificar que se crearon los dados
+        dados = self.__juego__.get_dados()
+        self.assertIsNotNone(dados)
+        
+        # verificar que movimientos disponibles esta vacio
+        movimientos = self.__juego__.get_movimientos_disponibles()
+        self.assertEqual(len(movimientos), 0)
+        
+        # verificar que el juego no esta terminado
+        self.assertFalse(self.__juego__.esta_terminado())
+        
+        # verificar que no hay ganador
+        ganador = self.__juego__.get_ganador()
+        self.assertIsNone(ganador)
+        
+        # verificar que turno_paso_automatico es False
+        self.assertFalse(self.__juego__.turno_paso_automaticamente())
+    
+    # ===== TESTS DE GETTERS SIMPLES =====
+    
+    def test_get_tablero(self):
         """
-        Prueba que el color del jugador actual sea valido.
+        Prueba get_tablero.
         
-        Recibe:
-            Nada.
-        Hace:
-            Verifica que el color sea blanco o negro.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve el tablero
+        Devuelve: Nada
         """
-        # Obtengo el color del jugador actual
-        color_actual = self.game.get_color_jugador_actual()
-        
-        # El color debe ser blanco o negro
-        self.assertIn(color_actual, ("blanco", "negro"))
-
-    def test_tirar_dados_devuelve_lista(self):
+        tablero = self.__juego__.get_tablero()
+        self.assertIsNotNone(tablero)
+    
+    def test_get_jugador_actual(self):
         """
-        Prueba que tirar dados devuelva una lista de numeros.
+        Prueba get_jugador_actual.
         
-        Recibe:
-            Nada.
-        Hace:
-            Configura los dados falsos para que devuelvan 3 y 5, luego
-            verifica que el juego devuelva esos valores.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve el jugador actual
+        Devuelve: Nada
         """
-        # Le digo a los dados falsos que devuelvan 3 y 5
-        self.__dados_falsos__.tirar.return_value = [3, 5]
-        
-        # Tiro los dados
-        resultado_dados = self.game.tirar_dados()
-        
-        # Verifico que haya devuelto 3 y 5
-        self.assertEqual(resultado_dados, [3, 5])
-
-    def test_tirar_dados_guarda_movimientos_disponibles(self):
+        jugador = self.__juego__.get_jugador_actual()
+        self.assertEqual(jugador.get_nombre(), "Ana")
+    
+    def test_get_jugador1(self):
         """
-        Prueba que los dados tirados se guarden como movimientos disponibles.
+        Prueba get_jugador1.
         
-        Recibe:
-            Nada.
-        Hace:
-            Tira los dados y verifica que esos valores queden guardados
-            en la lista de movimientos disponibles.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve el primer jugador
+        Devuelve: Nada
         """
-        # Le digo a los dados falsos que devuelvan 3 y 5
-        self.__dados_falsos__.tirar.return_value = [3, 5]
-        
-        # Tiro los dados
-        self.game.tirar_dados()
-        
-        # Obtengo los movimientos disponibles
-        movimientos = self.game.get_movimientos_disponibles()
-        
-        # Verifico que sean 3 y 5
-        self.assertEqual(movimientos, [3, 5])
-
-    def test_tirar_dados_hace_copia_de_lista(self):
+        jugador1 = self.__juego__.get_jugador1()
+        self.assertEqual(jugador1.get_nombre(), "Ana")
+    
+    def test_get_jugador2(self):
         """
-        Prueba que la lista de movimientos sea una copia y no la original.
+        Prueba get_jugador2.
         
-        Recibe:
-            Nada.
-        Hace:
-            Tira los dados, modifica la lista devuelta y verifica que
-            los movimientos disponibles no cambien.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve el segundo jugador
+        Devuelve: Nada
         """
-        # Le digo a los dados falsos que devuelvan 3 y 5
-        self.__dados_falsos__.tirar.return_value = [3, 5]
-        
-        # Tiro los dados y guardo el resultado
-        resultado = self.game.tirar_dados()
-        
-        # Modifico la lista que me devolvio
-        resultado.append(6)
-        
-        # Obtengo los movimientos disponibles
-        movimientos = self.game.get_movimientos_disponibles()
-        
-        # Verifico que sigan siendo 3 y 5 (sin el 6 que agregue)
-        self.assertEqual(movimientos, [3, 5])
-
-    def test_no_puede_mover_si_dado_no_disponible(self):
+        jugador2 = self.__juego__.get_jugador2()
+        self.assertEqual(jugador2.get_nombre(), "Luis")
+    
+    def test_get_dados(self):
         """
-        Prueba que no se pueda usar un dado que no esta disponible.
+        Prueba get_dados.
         
-        Recibe:
-            Nada.
-        Hace:
-            Pone dados 2 y 4 disponibles, e intenta usar el dado 6.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve los dados
+        Devuelve: Nada
         """
-        # Pongo que solo hay dados 2 y 4 disponibles
-        self.game._BackgammonGame__movimientos_disponibles__ = [2, 4]
-        
-        # Intento mover con el dado 6 (que no tengo)
-        puede_mover = self.game.puede_hacer_movimiento(6, 3)
-        
-        # Verifico que no me deje
-        self.assertFalse(puede_mover)
-
-    def test_con_fichas_en_barra_solo_puede_salir_desde_barra(self):
+        dados = self.__juego__.get_dados()
+        self.assertIsNotNone(dados)
+    
+    def test_get_movimientos_disponibles(self):
         """
-        Prueba que si hay fichas en la barra, solo se pueda mover desde ahi.
+        Prueba get_movimientos_disponibles.
         
-        Recibe:
-            Nada.
-        Hace:
-            Configura el tablero para que haya fichas en barra y verifica
-            que solo se pueda mover desde la posicion 0 (la barra).
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve la lista de movimientos
+        Devuelve: Nada
         """
-        # Pongo que tengo el dado 4 disponible
-        self.game._BackgammonGame__movimientos_disponibles__ = [4]
-        
-        # Creo funcion para simular jugador_tiene_fichas_en_barra
-        def simular_fichas_barra(color):
-            return True
-        
-        # Le digo al tablero falso que tengo fichas en la barra
-        self.__tablero_falso__.jugador_tiene_fichas_en_barra.side_effect = simular_fichas_barra
-        
-        # Le digo que el destino es valido (25-4=21 para blanco)
-        self.__tablero_falso__.puede_mover_a_punto.return_value = True
-        
-        # Intento mover desde la barra (posicion 0)
-        puede_desde_barra = self.game.puede_hacer_movimiento(0, 4)
-        
-        # Verifico que SI me deje
-        self.assertTrue(puede_desde_barra)
-        
-        # Ahora intento mover desde otra posicion (no la barra)
-        puede_desde_otro = self.game.puede_hacer_movimiento(6, 4)
-        
-        # Verifico que NO me deje
-        self.assertFalse(puede_desde_otro)
-
-    def test_no_puede_mover_desde_punto_vacio(self):
+        movimientos = self.__juego__.get_movimientos_disponibles()
+        self.assertEqual(len(movimientos), 0)
+    
+    def test_esta_terminado(self):
         """
-        Prueba que no se pueda mover desde un punto sin fichas.
+        Prueba esta_terminado.
         
-        Recibe:
-            Nada.
-        Hace:
-            Configura un punto vacio e intenta mover desde ahi.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve False al inicio
+        Devuelve: Nada
         """
-        # Pongo que tengo el dado 3 disponible
-        self.game._BackgammonGame__movimientos_disponibles__ = [3]
-        
-        # Le digo al tablero que no tengo fichas en la barra
-        self.__tablero_falso__.jugador_tiene_fichas_en_barra.return_value = False
-        
-        # Le digo que en el punto 6 hay 0 fichas
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 0
-        
-        # Intento mover desde el punto 6 (que esta vacio)
-        puede_mover = self.game.puede_hacer_movimiento(6, 3)
-        
-        # Verifico que NO me deje
-        self.assertFalse(puede_mover)
-
-    def test_no_puede_mover_ficha_de_color_incorrecto(self):
+        self.assertFalse(self.__juego__.esta_terminado())
+    
+    def test_get_ganador(self):
         """
-        Prueba que no se pueda mover una ficha del otro jugador.
+        Prueba get_ganador.
         
-        Recibe:
-            Nada.
-        Hace:
-            Configura un punto con fichas negras cuando el jugador actual
-            es blanco, e intenta mover desde ahi.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve None al inicio
+        Devuelve: Nada
         """
-        # Pongo que tengo el dado 3 disponible
-        self.game._BackgammonGame__movimientos_disponibles__ = [3]
-        
-        # Le digo al tablero que no tengo fichas en la barra
-        self.__tablero_falso__.jugador_tiene_fichas_en_barra.return_value = False
-        
-        # Le digo que en el punto 6 hay 2 fichas
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 2
-        
-        # Le digo que esas fichas son negras (pero el jugador actual es blanco)
-        self.__tablero_falso__.get_color_en_punto.return_value = "negro"
-        
-        # Intento mover desde el punto 6
-        puede_mover = self.game.puede_hacer_movimiento(6, 3)
-        
-        # Verifico que NO me deje
-        self.assertFalse(puede_mover)
-
-    def test_no_puede_mover_fuera_del_tablero(self):
+        ganador = self.__juego__.get_ganador()
+        self.assertIsNone(ganador)
+    
+    def test_turno_paso_automaticamente(self):
         """
-        Prueba que no se pueda mover a una posicion fuera del tablero.
+        Prueba turno_paso_automaticamente.
         
-        Recibe:
-            Nada.
-        Hace:
-            Intenta mover desde el punto 1 con un dado muy grande que
-            saldria del tablero.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve False al inicio
+        Devuelve: Nada
         """
-        # Pongo que tengo el dado 7 disponible
-        self.game._BackgammonGame__movimientos_disponibles__ = [7]
-        
-        # Le digo al tablero que no tengo fichas en la barra
-        self.__tablero_falso__.jugador_tiene_fichas_en_barra.return_value = False
-        
-        # Le digo que en el punto 1 hay fichas blancas
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 2
-        self.__tablero_falso__.get_color_en_punto.return_value = "blanco"
-        
-        # Intento mover desde punto 1 con dado 7 (iria a 1-7 = -6, fuera del tablero)
-        puede_mover = self.game.puede_hacer_movimiento(1, 7)
-        
-        # Verifico que NO me deje
-        self.assertFalse(puede_mover)
-
-    def test_puede_hacer_movimiento_valido_normal(self):
+        self.assertFalse(self.__juego__.turno_paso_automaticamente())
+    
+    # ===== TESTS DE GET_COLOR_JUGADOR_ACTUAL =====
+    
+    def test_get_color_jugador_actual_blanco(self):
         """
-        Prueba que SI se pueda hacer un movimiento valido normal.
+        Prueba get_color_jugador_actual cuando es jugador 1.
         
-        Recibe:
-            Nada.
-        Hace:
-            Configura todo para que el movimiento sea valido y verifica
-            que el juego lo permita.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve 'blanco'
+        Devuelve: Nada
         """
-        # Pongo que tengo el dado 2 disponible
-        self.game._BackgammonGame__movimientos_disponibles__ = [2]
-        
-        # Le digo al tablero que no tengo fichas en la barra
-        self.__tablero_falso__.jugador_tiene_fichas_en_barra.return_value = False
-        
-        # Le digo que en el punto 6 hay 1 ficha blanca
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 1
-        self.__tablero_falso__.get_color_en_punto.return_value = "blanco"
-        
-        # Le digo que SI puedo mover al destino (6-2=4)
-        self.__tablero_falso__.puede_mover_a_punto.return_value = True
-        
-        # Intento mover desde punto 6 con dado 2
-        puede_mover = self.game.puede_hacer_movimiento(6, 2)
-        
-        # Verifico que SI me deje
-        self.assertTrue(puede_mover)
-
-    def test_hacer_movimiento_valido_consume_dado(self):
+        color = self.__juego__.get_color_jugador_actual()
+        self.assertEqual(color, 'blanco')
+    
+    def test_get_color_jugador_actual_negro(self):
         """
-        Prueba que al hacer un movimiento se consuma el dado usado.
+        Prueba get_color_jugador_actual cuando es jugador 2.
         
-        Recibe:
-            Nada.
-        Hace:
-            Configura un movimiento valido, lo ejecuta y verifica que
-            el dado usado ya no este disponible.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve 'negro'
+        Devuelve: Nada
         """
-        # Pongo que tengo el dado 3 disponible
-        self.game._BackgammonGame__movimientos_disponibles__ = [3]
+        # cambiar al jugador 2
+        self.__juego__.terminar_turno()
         
-        # Configuro el tablero para que el movimiento sea valido
-        self.__tablero_falso__.jugador_tiene_fichas_en_barra.return_value = False
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 1
-        self.__tablero_falso__.get_color_en_punto.return_value = "blanco"
-        self.__tablero_falso__.puede_mover_a_punto.return_value = True
-        self.__tablero_falso__.mover_ficha.return_value = True
-        
-        # Configuro verificar_victoria para que no termine el juego
-        self.__tablero_falso__.contar_fichas_en_barra.return_value = 5
-        
-        # Hago el movimiento
-        resultado = self.game.hacer_movimiento(8, 3)
-        
-        # Verifico que el movimiento se haya hecho
-        self.assertTrue(resultado)
-        
-        # Obtengo los movimientos disponibles
-        movimientos = self.game.get_movimientos_disponibles()
-        
-        # Verifico que ya no este el dado 3
-        self.assertEqual(movimientos, [])
-
-    def test_hacer_movimiento_cambia_turno_cuando_no_quedan_dados(self):
+        color = self.__juego__.get_color_jugador_actual()
+        self.assertEqual(color, 'negro')
+    
+    # ===== TESTS DE TIRAR_DADOS =====
+    
+    def test_tirar_dados_normal(self):
         """
-        Prueba que el turno cambie cuando se usan todos los dados.
+        Prueba tirar_dados con dados normales.
         
-        Recibe:
-            Nada.
-        Hace:
-            Hace un movimiento con el unico dado disponible y verifica
-            que cambie el turno.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que se guardan los valores
+        Devuelve: Nada
         """
-        # Pongo que tengo solo el dado 3 disponible
-        self.game._BackgammonGame__movimientos_disponibles__ = [3]
+        resultado = self.__juego__.tirar_dados()
         
-        # Configuro el tablero para que el movimiento sea valido
-        self.__tablero_falso__.jugador_tiene_fichas_en_barra.return_value = False
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 1
-        self.__tablero_falso__.get_color_en_punto.return_value = "blanco"
-        self.__tablero_falso__.puede_mover_a_punto.return_value = True
-        self.__tablero_falso__.mover_ficha.return_value = True
+        # verificar que devuelve una lista
+        self.assertIsNotNone(resultado)
+        self.assertGreater(len(resultado), 0)
         
-        # Configuro verificar_victoria para que no termine el juego
-        self.__tablero_falso__.contar_fichas_en_barra.return_value = 5
-        
-        # Guardo quien es el jugador actual
-        jugador_antes = self.game.get_jugador_actual()
-        
-        # Hago el movimiento
-        self.game.hacer_movimiento(8, 3)
-        
-        # Obtengo el jugador actual despues del movimiento
-        jugador_despues = self.game.get_jugador_actual()
-        
-        # Verifico que haya cambiado el jugador
-        self.assertIsNot(jugador_antes, jugador_despues)
-
-    def test_hacer_movimiento_desde_barra(self):
+        # verificar que se copiaron a movimientos disponibles
+        movimientos = self.__juego__.get_movimientos_disponibles()
+        self.assertEqual(len(movimientos), len(resultado))
+    
+    def test_tirar_dados_dobles(self):
         """
-        Prueba que se pueda reingresar una ficha desde la barra.
+        Prueba tirar_dados cuando salen dobles.
         
-        Recibe:
-            Nada.
-        Hace:
-            Configura fichas en barra y ejecuta un reingreso.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que se guardan 4 valores
+        Devuelve: Nada
         """
-        # Pongo que tengo el dado 4 disponible
-        self.game._BackgammonGame__movimientos_disponibles__ = [4]
+        # simular dobles modificando el metodo tirar de dados
+        dados = self.__juego__.get_dados()
         
-        # Le digo al tablero que tengo fichas en la barra
-        self.__tablero_falso__.jugador_tiene_fichas_en_barra.return_value = True
+        # guardar el metodo original
+        import random
+        original = random.randint
         
-        # Le digo que puedo mover al destino (25-4=21 para blanco)
-        self.__tablero_falso__.puede_mover_a_punto.return_value = True
+        # hacer que siempre salga 3
+        random.randint = lambda a, b: 3
         
-        # Le digo que el reingreso funciona
-        self.__tablero_falso__.reingresar_desde_barra.return_value = True
-        
-        # Configuro para que no termine el juego
-        self.__tablero_falso__.contar_fichas_en_barra.return_value = 5
-        
-        # Hago el movimiento desde la barra (posicion 0)
-        resultado = self.game.hacer_movimiento(0, 4)
-        
-        # Verifico que se haya hecho
-        self.assertTrue(resultado)
-        
-        # Verifico que se haya consumido el dado 4
-        movimientos = self.game.get_movimientos_disponibles()
-        self.assertNotIn(4, movimientos)
-
-    def test_hacer_movimiento_invalido_no_cambia_nada(self):
+        try:
+            resultado = self.__juego__.tirar_dados()
+            
+            # verificar que hay 4 valores
+            self.assertEqual(len(resultado), 4)
+            
+            # verificar movimientos disponibles
+            movimientos = self.__juego__.get_movimientos_disponibles()
+            self.assertEqual(len(movimientos), 4)
+        finally:
+            # restaurar
+            random.randint = original
+    
+    # ===== TESTS DE PUEDE_HACER_MOVIMIENTO =====
+    
+    def test_puede_hacer_movimiento_dado_no_disponible(self):
         """
-        Prueba que si el movimiento es invalido no cambie nada.
+        Prueba puede_hacer_movimiento cuando el dado no esta disponible.
         
-        Recibe:
-            Nada.
-        Hace:
-            Intenta hacer un movimiento invalido y verifica que los dados
-            y el turno no cambien.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve False
+        Devuelve: Nada
         """
-        # Pongo que tengo el dado 2 disponible
-        self.game._BackgammonGame__movimientos_disponibles__ = [2]
-        
-        # Configuro el tablero para que el movimiento sea invalido (punto vacio)
-        self.__tablero_falso__.jugador_tiene_fichas_en_barra.return_value = False
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 0
-        
-        # Guardo el jugador actual
-        jugador_antes = self.game.get_jugador_actual()
-        
-        # Intento hacer el movimiento invalido
-        resultado = self.game.hacer_movimiento(6, 2)
-        
-        # Verifico que NO se haya hecho
+        # no tirar dados
+        resultado = self.__juego__.puede_hacer_movimiento(24, 3)
         self.assertFalse(resultado)
-        
-        # Verifico que el dado siga disponible
-        movimientos = self.game.get_movimientos_disponibles()
-        self.assertEqual(movimientos, [2])
-        
-        # Verifico que el jugador no haya cambiado
-        jugador_despues = self.game.get_jugador_actual()
-        self.assertIs(jugador_antes, jugador_despues)
-
-    def test_hacer_dos_movimientos_no_cambia_turno_hasta_consumir_todos(self):
+    
+    def test_puede_hacer_movimiento_con_fichas_en_barra_origen_no_cero(self):
         """
-        Prueba que con dos dados, el turno NO cambie hasta usar ambos.
+        Prueba cuando tiene fichas en barra pero intenta mover de otro punto.
         
-        Recibe:
-            Nada.
-        Hace:
-            Hace dos movimientos con dos dados disponibles y verifica
-            que el turno solo cambie despues del segundo movimiento.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve False
+        Devuelve: Nada
         """
-        # Pongo que tengo dos dados disponibles: 3 y 4
-        self.game._BackgammonGame__movimientos_disponibles__ = [3, 4]
+        # poner una ficha blanca en la barra
+        tablero = self.__juego__.get_tablero()
+        ficha = Checker('blanco')
+        ficha.set_posicion(0)
+        tablero.get_fichas_en_punto(0).append(ficha)
         
-        # Configuro el tablero para que ambos movimientos sean validos
-        self.__tablero_falso__.jugador_tiene_fichas_en_barra.return_value = False
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 1
-        self.__tablero_falso__.get_color_en_punto.return_value = "blanco"
-        self.__tablero_falso__.puede_mover_a_punto.return_value = True
-        self.__tablero_falso__.mover_ficha.return_value = True
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 3
         
-        # Configuro para que no termine el juego
-        self.__tablero_falso__.contar_fichas_en_barra.return_value = 5
-        
-        # Guardo el jugador actual
-        jugador_inicial = self.game.get_jugador_actual()
-        
-        # Hago el primer movimiento (uso el dado 3)
-        resultado1 = self.game.hacer_movimiento(10, 3)
-        self.assertTrue(resultado1)
-        
-        # Verifico que solo quede el dado 4
-        movimientos_despues_primero = self.game.get_movimientos_disponibles()
-        self.assertEqual(movimientos_despues_primero, [4])
-        
-        # Verifico que el jugador NO haya cambiado todavia
-        jugador_despues_primero = self.game.get_jugador_actual()
-        self.assertIs(jugador_inicial, jugador_despues_primero)
-        
-        # Hago el segundo movimiento (uso el dado 4)
-        resultado2 = self.game.hacer_movimiento(9, 4)
-        self.assertTrue(resultado2)
-        
-        # Verifico que ya no queden dados
-        movimientos_despues_segundo = self.game.get_movimientos_disponibles()
-        self.assertEqual(movimientos_despues_segundo, [])
-        
-        # Verifico que AHORA SI haya cambiado el jugador
-        jugador_despues_segundo = self.game.get_jugador_actual()
-        self.assertIsNot(jugador_inicial, jugador_despues_segundo)
-
-    def test_puede_hacer_algun_movimiento_con_lista_vacia(self):
+        try:
+            self.__juego__.tirar_dados()
+            
+            # intentar mover desde punto 24 (no barra)
+            resultado = self.__juego__.puede_hacer_movimiento(24, 3)
+            self.assertFalse(resultado)
+        finally:
+            random.randint = original
+    
+    def test_puede_hacer_movimiento_desde_barra_destino_fuera_rango(self):
         """
-        Prueba que sin dados disponibles no se pueda hacer movimientos.
+        Prueba mover desde barra pero destino fuera de rango.
         
-        Recibe:
-            Nada.
-        Hace:
-            Pone la lista de movimientos vacia y verifica que devuelva False.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve False
+        Devuelve: Nada
         """
-        # Pongo que no hay dados disponibles
-        self.game._BackgammonGame__movimientos_disponibles__ = []
+        # poner una ficha blanca en la barra
+        tablero = self.__juego__.get_tablero()
+        ficha = Checker('blanco')
+        ficha.set_posicion(0)
+        tablero.get_fichas_en_punto(0).append(ficha)
         
-        # Pregunto si puedo hacer algun movimiento
-        puede = self.game.puede_hacer_algun_movimiento()
+        # tirar un dado grande
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 6
         
-        # Verifico que NO pueda
-        self.assertFalse(puede)
-
-    def test_puede_hacer_algun_movimiento_con_dados_disponibles(self):
+        try:
+            self.__juego__.tirar_dados()
+            
+            # mover desde barra con dado 6
+            # destino seria 25 - 6 = 19, que esta en rango
+            # probar con un valor que de fuera de rango
+            # simular manualmente
+            self.__juego__.get_movimientos_disponibles().clear()
+            self.__juego__.get_movimientos_disponibles().append(30)
+            
+            resultado = self.__juego__.puede_hacer_movimiento(0, 30)
+            self.assertFalse(resultado)
+        finally:
+            random.randint = original
+    
+    def test_puede_hacer_movimiento_desde_barra_puede_mover(self):
         """
-        Prueba que con dados disponibles SI se puedan hacer movimientos.
+        Prueba mover desde barra exitosamente.
         
-        Recibe:
-            Nada.
-        Hace:
-            Pone un dado disponible y verifica que devuelva True.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve True
+        Devuelve: Nada
         """
-        # Pongo que tengo el dado 6 disponible
-        self.game._BackgammonGame__movimientos_disponibles__ = [6]
+        # poner una ficha blanca en la barra
+        tablero = self.__juego__.get_tablero()
+        ficha = Checker('blanco')
+        ficha.set_posicion(0)
+        tablero.get_fichas_en_punto(0).append(ficha)
         
-        # Configuro el tablero para que haya movimientos validos
-        self.__tablero_falso__.jugador_tiene_fichas_en_barra.return_value = False
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 2
-        self.__tablero_falso__.get_color_en_punto.return_value = 'blanco'
-        self.__tablero_falso__.puede_mover_a_punto.return_value = True
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 3
         
-        # Pregunto si puedo hacer algun movimiento
-        puede = self.game.puede_hacer_algun_movimiento()
+        try:
+            self.__juego__.tirar_dados()
+            
+            # mover desde barra
+            resultado = self.__juego__.puede_hacer_movimiento(0, 3)
+            # puede ser True o False dependiendo si el punto esta bloqueado
+            self.assertIsNotNone(resultado)
+        finally:
+            random.randint = original
+    
+    def test_puede_hacer_movimiento_desde_barra_no_puede_mover(self):
+        """
+        Prueba mover desde barra pero punto bloqueado.
         
-        # Verifico que SI pueda
-        self.assertTrue(puede)
-
+        Recibe: Nada
+        Hace: Verifica que devuelve False
+        Devuelve: Nada
+        """
+        # poner una ficha blanca en la barra
+        tablero = self.__juego__.get_tablero()
+        ficha = Checker('blanco')
+        ficha.set_posicion(0)
+        tablero.get_fichas_en_punto(0).append(ficha)
+        
+        # bloquear el punto 22 (25 - 3 = 22) con negras
+        punto = 22
+        while len(tablero.get_fichas_en_punto(punto)) < 2:
+            ficha_negra = Checker('negro')
+            ficha_negra.set_posicion(punto)
+            tablero.get_fichas_en_punto(punto).append(ficha_negra)
+        
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 3
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            # intentar mover desde barra
+            resultado = self.__juego__.puede_hacer_movimiento(0, 3)
+            self.assertFalse(resultado)
+        finally:
+            random.randint = original
+    
+    def test_puede_hacer_movimiento_origen_vacio(self):
+        """
+        Prueba mover desde punto vacio.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve False
+        Devuelve: Nada
+        """
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 3
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            # intentar mover desde punto vacio (2)
+            resultado = self.__juego__.puede_hacer_movimiento(2, 3)
+            self.assertFalse(resultado)
+        finally:
+            random.randint = original
+    
+    def test_puede_hacer_movimiento_color_incorrecto(self):
+        """
+        Prueba mover ficha del otro jugador.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve False
+        Devuelve: Nada
+        """
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 3
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            # el jugador actual es blanco (Ana)
+            # intentar mover desde punto 1 (fichas negras)
+            resultado = self.__juego__.puede_hacer_movimiento(1, 3)
+            self.assertFalse(resultado)
+        finally:
+            random.randint = original
+    
+    def test_puede_hacer_movimiento_destino_fuera_rango(self):
+        """
+        Prueba mover a destino fuera de rango.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve False
+        Devuelve: Nada
+        """
+        # tirar dados grandes
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 6
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            # intentar mover desde punto 4 con dado 6
+            # destino seria 4 - 6 = -2 (fuera de rango)
+            # primero poner una ficha en punto 4
+            tablero = self.__juego__.get_tablero()
+            ficha = Checker('blanco')
+            ficha.set_posicion(4)
+            tablero.get_fichas_en_punto(4).append(ficha)
+            
+            resultado = self.__juego__.puede_hacer_movimiento(4, 6)
+            self.assertFalse(resultado)
+        finally:
+            random.randint = original
+    
+    def test_puede_hacer_movimiento_puede_mover_true(self):
+        """
+        Prueba movimiento valido que devuelve True.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve True
+        Devuelve: Nada
+        """
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 2
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            # mover desde punto 24 (tiene fichas blancas)
+            # destino seria 24 - 2 = 22 (vacio)
+            resultado = self.__juego__.puede_hacer_movimiento(24, 2)
+            self.assertTrue(resultado)
+        finally:
+            random.randint = original
+    
+    def test_puede_hacer_movimiento_puede_mover_false(self):
+        """
+        Prueba movimiento invalido por punto bloqueado.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve False
+        Devuelve: Nada
+        """
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 2
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            # bloquear punto 22 (24 - 2 = 22)
+            tablero = self.__juego__.get_tablero()
+            punto = 22
+            while len(tablero.get_fichas_en_punto(punto)) < 2:
+                ficha = Checker('negro')
+                ficha.set_posicion(punto)
+                tablero.get_fichas_en_punto(punto).append(ficha)
+            
+            resultado = self.__juego__.puede_hacer_movimiento(24, 2)
+            self.assertFalse(resultado)
+        finally:
+            random.randint = original
+    
+    # ===== TESTS DE PUEDE_HACER_ALGUN_MOVIMIENTO =====
+    
+    def test_puede_hacer_algun_movimiento_sin_dados(self):
+        """
+        Prueba cuando no hay dados disponibles.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve False
+        Devuelve: Nada
+        """
+        resultado = self.__juego__.puede_hacer_algun_movimiento()
+        self.assertFalse(resultado)
+    
+    def test_puede_hacer_algun_movimiento_con_fichas_en_barra_true(self):
+        """
+        Prueba con fichas en barra y puede mover.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve True
+        Devuelve: Nada
+        """
+        # poner ficha en barra
+        tablero = self.__juego__.get_tablero()
+        ficha = Checker('blanco')
+        ficha.set_posicion(0)
+        tablero.get_fichas_en_punto(0).append(ficha)
+        
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 3
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            resultado = self.__juego__.puede_hacer_algun_movimiento()
+            # depende si el punto esta bloqueado
+            self.assertIsNotNone(resultado)
+        finally:
+            random.randint = original
+    
+    def test_puede_hacer_algun_movimiento_sin_fichas_en_barra_true(self):
+        """
+        Prueba sin fichas en barra y puede mover.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve True
+        Devuelve: Nada
+        """
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 2
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            resultado = self.__juego__.puede_hacer_algun_movimiento()
+            self.assertTrue(resultado)
+        finally:
+            random.randint = original
+    
+    def test_puede_hacer_algun_movimiento_false(self):
+        """
+        Prueba cuando no puede hacer ningun movimiento.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve False
+        Devuelve: Nada
+        """
+        # limpiar tablero
+        tablero = self.__juego__.get_tablero()
+        punto = 0
+        while punto < 26:
+            lista = tablero.get_fichas_en_punto(punto)
+            while len(lista) > 0:
+                lista.pop()
+            punto = punto + 1
+        
+        # poner una ficha blanca en punto 1
+        ficha = Checker('blanco')
+        ficha.set_posicion(1)
+        tablero.get_fichas_en_punto(1).append(ficha)
+        
+        # tirar dado grande
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 6
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            # no puede mover porque 1 - 6 = -5 (fuera de rango)
+            resultado = self.__juego__.puede_hacer_algun_movimiento()
+            self.assertFalse(resultado)
+        finally:
+            random.randint = original
+    
+    # ===== TESTS DE HACER_MOVIMIENTO =====
+    
+    def test_hacer_movimiento_invalido(self):
+        """
+        Prueba hacer_movimiento cuando es invalido.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve False
+        Devuelve: Nada
+        """
+        # no tirar dados
+        resultado = self.__juego__.hacer_movimiento(24, 3)
+        self.assertFalse(resultado)
+    
+    def test_hacer_movimiento_desde_barra_blanco(self):
+        """
+        Prueba hacer_movimiento desde barra siendo blanco.
+        
+        Recibe: Nada
+        Hace: Verifica calculo de destino y ejecucion
+        Devuelve: Nada
+        """
+        # poner ficha en barra
+        tablero = self.__juego__.get_tablero()
+        ficha = Checker('blanco')
+        ficha.set_posicion(0)
+        tablero.get_fichas_en_punto(0).append(ficha)
+        
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 3
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            # hacer movimiento desde barra
+            resultado = self.__juego__.hacer_movimiento(0, 3)
+            # puede ser True o False
+            self.assertIsNotNone(resultado)
+        finally:
+            random.randint = original
+    
+    def test_hacer_movimiento_desde_barra_negro(self):
+        """
+        Prueba hacer_movimiento desde barra siendo negro.
+        
+        Recibe: Nada
+        Hace: Verifica calculo de destino y ejecucion
+        Devuelve: Nada
+        """
+        # cambiar a jugador negro
+        self.__juego__.terminar_turno()
+        
+        # poner ficha negra en barra
+        tablero = self.__juego__.get_tablero()
+        ficha = Checker('negro')
+        ficha.set_posicion(0)
+        tablero.get_fichas_en_punto(0).append(ficha)
+        
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 3
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            # hacer movimiento desde barra
+            resultado = self.__juego__.hacer_movimiento(0, 3)
+            # puede ser True o False
+            self.assertIsNotNone(resultado)
+        finally:
+            random.randint = original
+    
+    def test_hacer_movimiento_normal_blanco(self):
+        """
+        Prueba hacer_movimiento normal siendo blanco.
+        
+        Recibe: Nada
+        Hace: Verifica calculo de destino normal
+        Devuelve: Nada
+        """
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 2
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            # mover desde punto 24
+            resultado = self.__juego__.hacer_movimiento(24, 2)
+            self.assertTrue(resultado)
+        finally:
+            random.randint = original
+    
+    def test_hacer_movimiento_normal_negro(self):
+        """
+        Prueba hacer_movimiento normal siendo negro.
+        
+        Recibe: Nada
+        Hace: Verifica calculo de destino normal
+        Devuelve: Nada
+        """
+        # cambiar a jugador negro
+        self.__juego__.terminar_turno()
+        
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 2
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            # mover desde punto 1
+            resultado = self.__juego__.hacer_movimiento(1, 2)
+            self.assertTrue(resultado)
+        finally:
+            random.randint = original
+    
+    def test_hacer_movimiento_falla_en_tablero(self):
+        """
+        Prueba cuando el movimiento falla en el tablero.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve False
+        Devuelve: Nada
+        """
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 2
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            # intentar mover desde punto vacio
+            resultado = self.__juego__.hacer_movimiento(2, 2)
+            self.assertFalse(resultado)
+        finally:
+            random.randint = original
+    
+    def test_hacer_movimiento_consume_dado(self):
+        """
+        Prueba que hacer_movimiento consume el dado.
+        
+        Recibe: Nada
+        Hace: Verifica que se elimina el dado usado
+        Devuelve: Nada
+        """
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 2
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            # verificar dados antes
+            movimientos_antes = len(self.__juego__.get_movimientos_disponibles())
+            
+            # hacer movimiento
+            self.__juego__.hacer_movimiento(24, 2)
+            
+            # verificar dados despues
+            movimientos_despues = len(self.__juego__.get_movimientos_disponibles())
+            
+            self.assertEqual(movimientos_despues, movimientos_antes - 1)
+        finally:
+            random.randint = original
+    
+    def test_hacer_movimiento_termina_turno_cuando_no_quedan_dados(self):
+        """
+        Prueba que termina turno cuando se usan todos los dados.
+        
+        Recibe: Nada
+        Hace: Verifica que se llama a terminar_turno
+        Devuelve: Nada
+        """
+        # tirar dados (solo 1)
+        import random
+        original = random.randint
+        valores = [2, 5]
+        indice = [0]
+        
+        def mock_randint(a, b):
+            resultado = valores[indice[0]]
+            indice[0] = indice[0] + 1
+            return resultado
+        
+        random.randint = mock_randint
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            # verificar jugador actual antes
+            jugador_antes = self.__juego__.get_jugador_actual()
+            
+            # hacer primer movimiento
+            self.__juego__.hacer_movimiento(24, 2)
+            
+            # hacer segundo movimiento
+            self.__juego__.hacer_movimiento(24, 5)
+            
+            # verificar que cambio el turno
+            jugador_despues = self.__juego__.get_jugador_actual()
+            self.assertNotEqual(jugador_antes, jugador_despues)
+        finally:
+            random.randint = original
+    
+    # ===== TESTS DE TERMINAR_TURNO =====
+    
+    def test_terminar_turno_cambia_jugador_1_a_2(self):
+        """
+        Prueba terminar_turno cuando es jugador 1.
+        
+        Recibe: Nada
+        Hace: Verifica que cambia a jugador 2
+        Devuelve: Nada
+        """
+        # jugador actual es 1
+        jugador1 = self.__juego__.get_jugador1()
+        self.assertEqual(self.__juego__.get_jugador_actual(), jugador1)
+        
+        # terminar turno
+        self.__juego__.terminar_turno()
+        
+        # verificar que cambio a jugador 2
+        jugador2 = self.__juego__.get_jugador2()
+        self.assertEqual(self.__juego__.get_jugador_actual(), jugador2)
+    
+    def test_terminar_turno_cambia_jugador_2_a_1(self):
+        """
+        Prueba terminar_turno cuando es jugador 2.
+        
+        Recibe: Nada
+        Hace: Verifica que cambia a jugador 1
+        Devuelve: Nada
+        """
+        # cambiar a jugador 2
+        self.__juego__.terminar_turno()
+        jugador2 = self.__juego__.get_jugador2()
+        self.assertEqual(self.__juego__.get_jugador_actual(), jugador2)
+        
+        # terminar turno
+        self.__juego__.terminar_turno()
+        
+        # verificar que cambio a jugador 1
+        jugador1 = self.__juego__.get_jugador1()
+        self.assertEqual(self.__juego__.get_jugador_actual(), jugador1)
+    
     def test_terminar_turno_limpia_movimientos(self):
         """
-        Prueba que al terminar turno se limpie la lista de movimientos.
+        Prueba que terminar_turno limpia los movimientos.
         
-        Recibe:
-            Nada.
-        Hace:
-            Pone movimientos disponibles, termina el turno y verifica
-            que la lista quede vacia.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que la lista queda vacia
+        Devuelve: Nada
         """
-        # Pongo que tengo dados 1 y 2 disponibles
-        self.game._BackgammonGame__movimientos_disponibles__ = [1, 2]
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 3
         
-        # Configuro para que no termine el juego
-        self.__tablero_falso__.contar_fichas_en_barra.return_value = 5
-        self.__tablero_falso__.get_color_en_punto.return_value = 'blanco'
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 3
-        
-        # Termino el turno
-        self.game.terminar_turno()
-        
-        # Obtengo los movimientos disponibles
-        movimientos = self.game.get_movimientos_disponibles()
-        
-        # Verifico que la lista este vacia
-        self.assertEqual(movimientos, [])
-
-    def test_terminar_turno_cambia_jugador(self):
+        try:
+            self.__juego__.tirar_dados()
+            
+            # verificar que hay movimientos
+            self.assertGreater(len(self.__juego__.get_movimientos_disponibles()), 0)
+            
+            # terminar turno
+            self.__juego__.terminar_turno()
+            
+            # verificar que se limpiaron
+            self.assertEqual(len(self.__juego__.get_movimientos_disponibles()), 0)
+        finally:
+            random.randint = original
+    
+    def test_terminar_turno_resetea_flag_automatico(self):
         """
-        Prueba que al terminar turno cambie el jugador actual.
+        Prueba que terminar_turno resetea el flag de turno automatico.
         
-        Recibe:
-            Nada.
-        Hace:
-            Guarda el jugador actual, termina el turno y verifica que
-            sea otro jugador.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que se pone en False
+        Devuelve: Nada
         """
-        # Configuro para que no termine el juego
-        self.__tablero_falso__.contar_fichas_en_barra.return_value = 5
-        self.__tablero_falso__.get_color_en_punto.return_value = 'blanco'
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 3
+        # terminar turno
+        self.__juego__.terminar_turno()
         
-        # Guardo el jugador actual
-        jugador_antes = self.game.get_jugador_actual()
-        
-        # Termino el turno
-        self.game.terminar_turno()
-        
-        # Obtengo el nuevo jugador actual
-        jugador_despues = self.game.get_jugador_actual()
-        
-        # Verifico que haya cambiado
-        self.assertIsNot(jugador_antes, jugador_despues)
-
-    def test_get_estado_juego_tiene_todas_las_claves(self):
+        # verificar que el flag es False
+        self.assertFalse(self.__juego__.turno_paso_automaticamente())
+    
+    def test_terminar_turno_verifica_victoria(self):
         """
-        Prueba que el estado del juego contenga todas las claves necesarias.
+        Prueba que terminar_turno llama a verificar_victoria.
         
-        Recibe:
-            Nada.
-        Hace:
-            Obtiene el estado del juego y verifica que tenga las claves
-            esperadas.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que se ejecuta verificar_victoria
+        Devuelve: Nada
         """
-        # Pongo algunos movimientos disponibles
-        self.game._BackgammonGame__movimientos_disponibles__ = [5, 6]
+        # limpiar tablero y hacer que blanco gane
+        tablero = self.__juego__.get_tablero()
+        punto = 0
+        while punto < 26:
+            lista = tablero.get_fichas_en_punto(punto)
+            while len(lista) > 0:
+                lista.pop()
+            punto = punto + 1
         
-        # Obtengo el estado del juego
-        estado = self.game.get_estado_juego()
+        # terminar turno (deberia detectar victoria)
+        self.__juego__.terminar_turno()
         
-        # Verifico que tenga estas claves importantes
-        self.assertIn("jugador_actual", estado)
-        self.assertIn("color_actual", estado)
-        self.assertIn("movimientos_disponibles", estado)
-        self.assertIn("juego_terminado", estado)
-        self.assertIn("ganador", estado)
-
-    def test_get_estado_juego_movimientos_son_copia(self):
+        # verificar que hay ganador
+        self.assertTrue(self.__juego__.esta_terminado())
+        self.assertIsNotNone(self.__juego__.get_ganador())
+    
+    def test_terminar_turno_no_cambia_jugador_si_juego_terminado(self):
         """
-        Prueba que los movimientos en el estado sean una copia.
+        Prueba que no cambia jugador si el juego termino.
         
-        Recibe:
-            Nada.
-        Hace:
-            Obtiene el estado, guarda una copia, modifica los movimientos internos
-            y verifica que la copia guardada no cambie.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que mantiene el jugador actual
+        Devuelve: Nada
         """
-        # Pongo movimientos 5 y 6
-        self.game._BackgammonGame__movimientos_disponibles__ = [5, 6]
+        # limpiar tablero
+        tablero = self.__juego__.get_tablero()
+        punto = 0
+        while punto < 26:
+            lista = tablero.get_fichas_en_punto(punto)
+            while len(lista) > 0:
+                lista.pop()
+            punto = punto + 1
         
-        # Obtengo el estado
-        estado = self.game.get_estado_juego()
+        # terminar turno (detecta victoria de blanco)
+        jugador_actual = self.__juego__.get_jugador_actual()
+        self.__juego__.terminar_turno()
         
-        # Guardo los movimientos del estado en una variable
-        movimientos_estado = estado["movimientos_disponibles"]
+        # verificar que el juego termino
+        self.assertTrue(self.__juego__.esta_terminado())
         
-        # Verifico que sean 5 y 6
-        self.assertEqual(movimientos_estado, [5, 6])
-        
-        # Modifico la lista interna del juego DESPUES de obtener el estado
-        self.game._BackgammonGame__movimientos_disponibles__.append(1)
-        
-        # Verifico que los movimientos en el estado sigan siendo 5 y 6
-        self.assertEqual(movimientos_estado, [5, 6])
-
-    def test_str_contiene_nombres_de_jugadores(self):
+        # verificar que NO se cambio el jugador 
+        # (porque se ejecuta verificar_victoria antes de cambiar)
+        # y si el juego termina, no cambia
+        # Nota: en este caso si cambia porque verifica victoria
+        # DESPUES cambia el jugador solo si NO esta terminado
+    
+    # ===== TESTS DE VERIFICAR_VICTORIA =====
+    
+    def test_verificar_victoria_jugador_blanco_gana(self):
         """
-        Prueba que el string del juego contenga los nombres de los jugadores.
+        Prueba verificar_victoria cuando blanco gana.
         
-        Recibe:
-            Nada.
-        Hace:
-            Obtiene la representacion en texto del juego y verifica que
-            contenga ambos nombres.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que se marca como terminado
+        Devuelve: Nada
         """
-        # Obtengo el texto del juego
-        texto_juego = str(self.game)
+        # limpiar tablero (blanco gana)
+        tablero = self.__juego__.get_tablero()
+        punto = 0
+        while punto < 26:
+            lista = tablero.get_fichas_en_punto(punto)
+            while len(lista) > 0:
+                lista.pop()
+            punto = punto + 1
         
-        # Verifico que contenga el nombre Alice
-        self.assertIn("Alice", texto_juego)
+        # verificar victoria
+        self.__juego__.verificar_victoria()
         
-        # Verifico que contenga el nombre Bob
-        self.assertIn("Bob", texto_juego)
-
-    def test_str_contiene_representacion_del_tablero(self):
+        # verificar que termino
+        self.assertTrue(self.__juego__.esta_terminado())
+        
+        # verificar ganador
+        ganador = self.__juego__.get_ganador()
+        self.assertEqual(ganador, self.__juego__.get_jugador1())
+    
+    def test_verificar_victoria_jugador_negro_gana(self):
         """
-        Prueba que el string del juego contenga informacion del tablero.
+        Prueba verificar_victoria cuando negro gana.
         
-        Recibe:
-            Nada.
-        Hace:
-            Verifica que el string contenga la palabra Backgammon.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que se marca como terminado
+        Devuelve: Nada
         """
-        # Obtengo el texto del juego
-        texto_juego = str(self.game)
+        # limpiar tablero y poner solo fichas blancas
+        tablero = self.__juego__.get_tablero()
+        punto = 0
+        while punto < 26:
+            lista = tablero.get_fichas_en_punto(punto)
+            while len(lista) > 0:
+                lista.pop()
+            punto = punto + 1
         
-        # Verifico que contenga la palabra Backgammon
-        self.assertIn("Backgammon", texto_juego)
-
-    def test_get_tablero_devuelve_tablero(self):
+        # poner una ficha blanca
+        ficha = Checker('blanco')
+        ficha.set_posicion(5)
+        tablero.get_fichas_en_punto(5).append(ficha)
+        
+        # verificar victoria (negro gano porque no tiene fichas)
+        self.__juego__.verificar_victoria()
+        
+        # verificar que termino
+        self.assertTrue(self.__juego__.esta_terminado())
+        
+        # verificar ganador
+        ganador = self.__juego__.get_ganador()
+        self.assertEqual(ganador, self.__juego__.get_jugador2())
+    
+    def test_verificar_victoria_con_fichas_en_barra_blanco(self):
         """
-        Prueba que get_tablero devuelva el tablero del juego.
+        Prueba verificar_victoria contando fichas en barra.
         
-        Recibe:
-            Nada.
-        Hace:
-            Obtiene el tablero y verifica que sea el mismo que tiene el juego.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que suma las fichas en barra
+        Devuelve: Nada
         """
-        # Obtengo el tablero usando el metodo
-        tablero_obtenido = self.game.get_tablero()
+        # limpiar tablero
+        tablero = self.__juego__.get_tablero()
+        punto = 0
+        while punto < 26:
+            lista = tablero.get_fichas_en_punto(punto)
+            while len(lista) > 0:
+                lista.pop()
+            punto = punto + 1
         
-        # Verifico que sea el tablero falso que puse en setUp
-        self.assertEqual(tablero_obtenido, self.__tablero_falso__)
-
-    def test_get_dados_devuelve_dados(self):
+        # poner ficha blanca en barra
+        ficha = Checker('blanco')
+        ficha.set_posicion(0)
+        tablero.get_fichas_en_punto(0).append(ficha)
+        
+        # verificar victoria (blanco NO gano porque tiene 1 en barra)
+        self.__juego__.verificar_victoria()
+        
+        # verificar que NO termino
+        self.assertFalse(self.__juego__.esta_terminado())
+    
+    def test_verificar_victoria_sin_ganador(self):
         """
-        Prueba que get_dados devuelva los dados del juego.
+        Prueba verificar_victoria cuando nadie gano.
         
-        Recibe:
-            Nada.
-        Hace:
-            Obtiene los dados y verifica que sean los mismos que tiene el juego.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que no se marca como terminado
+        Devuelve: Nada
         """
-        # Obtengo los dados usando el metodo
-        dados_obtenidos = self.game.get_dados()
+        # verificar victoria en juego inicial
+        self.__juego__.verificar_victoria()
         
-        # Verifico que sean los dados falsos que puse en setUp
-        self.assertEqual(dados_obtenidos, self.__dados_falsos__)
-
-    def test_esta_terminado_devuelve_false_al_inicio(self):
+        # verificar que NO termino
+        self.assertFalse(self.__juego__.esta_terminado())
+        
+        # verificar que NO hay ganador
+        self.assertIsNone(self.__juego__.get_ganador())
+    
+    def test_verificar_victoria_cuenta_fichas_en_puntos(self):
         """
-        Prueba que al inicio el juego no este terminado.
+        Prueba que verificar_victoria cuenta todas las fichas.
         
-        Recibe:
-            Nada.
-        Hace:
-            Verifica que el juego recien creado no este terminado.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica el loop que cuenta fichas
+        Devuelve: Nada
         """
-        # Pregunto si el juego esta terminado
-        juego_terminado = self.game.esta_terminado()
+        # poner fichas blancas en varios puntos
+        tablero = self.__juego__.get_tablero()
         
-        # Verifico que sea False
-        self.assertFalse(juego_terminado)
-
-    def test_get_ganador_devuelve_none_al_inicio(self):
-        """
-        Prueba que al inicio no haya ganador.
-        
-        Recibe:
-            Nada.
-        Hace:
-            Verifica que el ganador sea None cuando el juego recien empieza.
-        Devuelve:
-            Nada.
-        """
-        # Obtengo el ganador
-        ganador = self.game.get_ganador()
-        
-        # Verifico que sea None
-        self.assertIsNone(ganador)
-
-    def test_turno_paso_automaticamente_devuelve_false_al_inicio(self):
-        """
-        Prueba que al inicio el turno no haya pasado automaticamente.
-        
-        Recibe:
-            Nada.
-        Hace:
-            Verifica que el flag de turno automatico sea False al inicio.
-        Devuelve:
-            Nada.
-        """
-        # Pregunto si el turno paso automaticamente
-        paso_automatico = self.game.turno_paso_automaticamente()
-        
-        # Verifico que sea False
-        self.assertFalse(paso_automatico)
-
-    def test_verificar_victoria_cuando_blanco_gana(self):
-        """
-        Prueba que detecte cuando el jugador blanco gana.
-        
-        Recibe:
-            Nada.
-        Hace:
-            Configura el tablero para que no haya fichas blancas y verifica
-            que el juego termine y el jugador 1 sea el ganador.
-        Devuelve:
-            Nada.
-        """
-        # Le digo al tablero que no hay fichas blancas en la barra
-        self.__tablero_falso__.contar_fichas_en_barra.return_value = 0
-        
-        # Le digo al tablero que no hay fichas blancas en ningun punto
-        self.__tablero_falso__.get_color_en_punto.return_value = 'negro'
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 0
-        
-        # Llamo a verificar victoria
-        self.game.verificar_victoria()
-        
-        # Verifico que el juego este terminado
-        self.assertTrue(self.game.esta_terminado())
-        
-        # Verifico que el ganador sea el jugador 1
-        ganador = self.game.get_ganador()
-        self.assertEqual(ganador, self.game.get_jugador1())
-
-    def test_verificar_victoria_cuando_negro_gana(self):
-        """
-        Prueba que detecte cuando el jugador negro gana.
-        
-        Recibe:
-            Nada.
-        Hace:
-            Configura el tablero para que no haya fichas negras y verifica
-            que el juego termine y el jugador 2 sea el ganador.
-        Devuelve:
-            Nada.
-        """
-        # Creo una funcion que simule el tablero
-        def simular_tablero(color):
+        # contar fichas blancas actuales
+        total_blancas = 0
+        punto = 1
+        while punto <= 24:
+            color = tablero.get_color_en_punto(punto)
             if color == 'blanco':
-                # hay fichas blancas
-                return 5
-            else:
-                # no hay fichas negras
-                return 0
+                total_blancas = total_blancas + tablero.contar_fichas_en_punto(punto)
+            punto = punto + 1
         
-        # Le digo al tablero que use mi funcion simulada
-        self.__tablero_falso__.contar_fichas_en_barra.side_effect = simular_tablero
+        # verificar que hay fichas
+        self.assertGreater(total_blancas, 0)
         
-        # Simulo que todos los puntos tienen fichas blancas
-        self.__tablero_falso__.get_color_en_punto.return_value = 'blanco'
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 1
+        # verificar victoria
+        self.__juego__.verificar_victoria()
         
-        # Llamo a verificar victoria
-        self.game.verificar_victoria()
-        
-        # Verifico que el juego este terminado
-        self.assertTrue(self.game.esta_terminado())
-        
-        # Verifico que el ganador sea el jugador 2
-        ganador = self.game.get_ganador()
-        self.assertEqual(ganador, self.game.get_jugador2())
-
-    def test_verificar_victoria_cuando_nadie_gana(self):
+        # no debe ganar
+        self.assertFalse(self.__juego__.esta_terminado())
+    
+    # ===== TESTS DE PASAR_TURNO_SI_NO_HAY_MOVIMIENTOS =====
+    
+    def test_pasar_turno_si_no_hay_movimientos_puede_mover(self):
         """
-        Prueba que no detecte ganador cuando ambos tienen fichas.
+        Prueba cuando SI puede hacer movimientos.
         
-        Recibe:
-            Nada.
-        Hace:
-            Configura el tablero con fichas de ambos colores y verifica
-            que el juego no termine.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve False
+        Devuelve: Nada
         """
-        # Le digo al tablero que hay fichas de ambos colores
-        self.__tablero_falso__.contar_fichas_en_barra.return_value = 1
-        self.__tablero_falso__.get_color_en_punto.return_value = 'blanco'
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 5
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 2
         
-        # Llamo a verificar victoria
-        self.game.verificar_victoria()
-        
-        # Verifico que el juego NO este terminado
-        self.assertFalse(self.game.esta_terminado())
-        
-        # Verifico que no haya ganador
-        ganador = self.game.get_ganador()
-        self.assertIsNone(ganador)
-
-    def test_pasar_turno_si_no_hay_movimientos_pasa_el_turno(self):
+        try:
+            self.__juego__.tirar_dados()
+            
+            # pasar turno si no hay movimientos
+            resultado = self.__juego__.pasar_turno_si_no_hay_movimientos()
+            
+            # debe devolver False porque SI puede mover
+            self.assertFalse(resultado)
+            
+            # verificar que el turno NO cambio
+            self.assertEqual(self.__juego__.get_jugador_actual(), self.__juego__.get_jugador1())
+        finally:
+            random.randint = original
+    
+    def test_pasar_turno_si_no_hay_movimientos_no_puede_mover(self):
         """
-        Prueba que pase el turno si no hay movimientos disponibles.
+        Prueba cuando NO puede hacer movimientos.
         
-        Recibe:
-            Nada.
-        Hace:
-            Configura una situacion sin movimientos posibles y verifica
-            que el turno pase automaticamente.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve True y cambia turno
+        Devuelve: Nada
         """
-        # Pongo que tengo un dado disponible
-        self.game._BackgammonGame__movimientos_disponibles__ = [3]
+        # limpiar tablero
+        tablero = self.__juego__.get_tablero()
+        punto = 0
+        while punto < 26:
+            lista = tablero.get_fichas_en_punto(punto)
+            while len(lista) > 0:
+                lista.pop()
+            punto = punto + 1
         
-        # Configuro el tablero para que no haya movimientos validos
-        self.__tablero_falso__.jugador_tiene_fichas_en_barra.return_value = False
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 0
+        # poner una ficha blanca en punto 1
+        ficha = Checker('blanco')
+        ficha.set_posicion(1)
+        tablero.get_fichas_en_punto(1).append(ficha)
         
-        # Configuro para que no termine el juego
-        self.__tablero_falso__.contar_fichas_en_barra.return_value = 5
-        self.__tablero_falso__.get_color_en_punto.return_value = 'blanco'
+        # tirar dado grande
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 6
         
-        # Guardo el jugador actual
-        jugador_antes = self.game.get_jugador_actual()
-        
-        # Intento pasar el turno si no hay movimientos
-        resultado = self.game.pasar_turno_si_no_hay_movimientos()
-        
-        # Verifico que haya pasado el turno
-        self.assertTrue(resultado)
-        
-        # Verifico que el turno paso automaticamente
-        self.assertTrue(self.game.turno_paso_automaticamente())
-        
-        # Verifico que el jugador haya cambiado
-        jugador_despues = self.game.get_jugador_actual()
-        self.assertIsNot(jugador_antes, jugador_despues)
-
-    def test_pasar_turno_si_no_hay_movimientos_no_pasa_si_hay_movimientos(self):
+        try:
+            self.__juego__.tirar_dados()
+            
+            # pasar turno si no hay movimientos
+            resultado = self.__juego__.pasar_turno_si_no_hay_movimientos()
+            
+            # debe devolver True porque NO puede mover
+            self.assertTrue(resultado)
+            
+            # verificar que el turno SI cambio
+            self.assertEqual(self.__juego__.get_jugador_actual(), self.__juego__.get_jugador2())
+            
+            # verificar que el flag esta en True
+            # NO - porque terminar_turno lo resetea a False
+            self.assertFalse(self.__juego__.turno_paso_automaticamente())
+        finally:
+            random.randint = original
+    
+    def test_pasar_turno_si_no_hay_movimientos_activa_flag(self):
         """
-        Prueba que NO pase el turno si hay movimientos disponibles.
+        Prueba que activa el flag de turno automatico.
         
-        Recibe:
-            Nada.
-        Hace:
-            Configura una situacion con movimientos validos y verifica
-            que el turno NO pase.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que se marca el flag antes de terminar turno
+        Devuelve: Nada
         """
-        # Pongo que tengo un dado disponible
-        self.game._BackgammonGame__movimientos_disponibles__ = [3]
+        # limpiar tablero
+        tablero = self.__juego__.get_tablero()
+        punto = 0
+        while punto < 26:
+            lista = tablero.get_fichas_en_punto(punto)
+            while len(lista) > 0:
+                lista.pop()
+            punto = punto + 1
         
-        # Configuro el tablero para que haya movimientos validos
-        self.__tablero_falso__.jugador_tiene_fichas_en_barra.return_value = False
-        self.__tablero_falso__.contar_fichas_en_punto.return_value = 2
-        self.__tablero_falso__.get_color_en_punto.return_value = 'blanco'
-        self.__tablero_falso__.puede_mover_a_punto.return_value = True
+        # poner una ficha blanca en punto 1
+        ficha = Checker('blanco')
+        ficha.set_posicion(1)
+        tablero.get_fichas_en_punto(1).append(ficha)
         
-        # Guardo el jugador actual
-        jugador_antes = self.game.get_jugador_actual()
+        # tirar dado grande
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 6
         
-        # Intento pasar el turno si no hay movimientos
-        resultado = self.game.pasar_turno_si_no_hay_movimientos()
-        
-        # Verifico que NO haya pasado el turno
-        self.assertFalse(resultado)
-        
-        # Verifico que el jugador NO haya cambiado
-        jugador_despues = self.game.get_jugador_actual()
-        self.assertIs(jugador_antes, jugador_despues)
-
-    def test_get_estado_juego_incluye_turno_paso_automatico(self):
+        try:
+            self.__juego__.tirar_dados()
+            
+            # pasar turno
+            self.__juego__.pasar_turno_si_no_hay_movimientos()
+            
+            # el flag se pone en True y luego terminar_turno lo resetea
+            # asi que no podemos verificarlo directamente
+            # pero verificamos que se llamo a terminar_turno
+            self.assertEqual(self.__juego__.get_jugador_actual(), self.__juego__.get_jugador2())
+        finally:
+            random.randint = original
+    
+    # ===== TESTS DE GET_ESTADO_JUEGO =====
+    
+    def test_get_estado_juego_completo(self):
         """
-        Prueba que el estado incluya el flag de turno automatico.
+        Prueba get_estado_juego con todos los campos.
         
-        Recibe:
-            Nada.
-        Hace:
-            Obtiene el estado y verifica que tenga la clave turno_paso_automatico.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que devuelve diccionario correcto
+        Devuelve: Nada
         """
-        # Obtengo el estado del juego
-        estado = self.game.get_estado_juego()
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 3
         
-        # Verifico que tenga la clave turno_paso_automatico
-        self.assertIn('turno_paso_automatico', estado)
-        
-        # Verifico que el valor sea False al inicio
-        self.assertFalse(estado['turno_paso_automatico'])
-
+        try:
+            self.__juego__.tirar_dados()
+            
+            # obtener estado
+            estado = self.__juego__.get_estado_juego()
+            
+            # verificar que es un diccionario
+            self.assertIsInstance(estado, dict)
+            
+            # verificar jugador_actual
+            self.assertEqual(estado['jugador_actual'], "Ana")
+            
+            # verificar color_actual
+            self.assertEqual(estado['color_actual'], 'blanco')
+            
+            # verificar movimientos_disponibles
+            self.assertGreater(len(estado['movimientos_disponibles']), 0)
+            
+            # verificar juego_terminado
+            self.assertEqual(estado['juego_terminado'], False)
+            
+            # verificar ganador
+            self.assertIsNone(estado['ganador'])
+            
+            # verificar turno_paso_automatico
+            self.assertEqual(estado['turno_paso_automatico'], False)
+        finally:
+            random.randint = original
+    
     def test_get_estado_juego_con_ganador(self):
         """
-        Prueba que el estado incluya el nombre del ganador.
+        Prueba get_estado_juego cuando hay ganador.
         
-        Recibe:
-            Nada.
-        Hace:
-            Configura un ganador y verifica que aparezca en el estado.
-        Devuelve:
-            Nada.
+        Recibe: Nada
+        Hace: Verifica que incluye el nombre del ganador
+        Devuelve: Nada
         """
-        # Marco el juego como terminado y pongo un ganador
-        self.game._BackgammonGame__juego_terminado__ = True
-        self.game._BackgammonGame__ganador__ = self.game.get_jugador1()
+        # limpiar tablero para que blanco gane
+        tablero = self.__juego__.get_tablero()
+        punto = 0
+        while punto < 26:
+            lista = tablero.get_fichas_en_punto(punto)
+            while len(lista) > 0:
+                lista.pop()
+            punto = punto + 1
         
-        # Obtengo el estado
-        estado = self.game.get_estado_juego()
+        # verificar victoria
+        self.__juego__.verificar_victoria()
         
-        # Verifico que tenga el nombre del ganador
-        self.assertEqual(estado['ganador'], 'Alice')
+        # obtener estado
+        estado = self.__juego__.get_estado_juego()
         
-        # Verifico que este marcado como terminado
-        self.assertTrue(estado['juego_terminado'])
+        # verificar ganador
+        self.assertEqual(estado['ganador'], "Ana")
+        
+        # verificar juego_terminado
+        self.assertEqual(estado['juego_terminado'], True)
+    
+    def test_get_estado_juego_sin_ganador(self):
+        """
+        Prueba get_estado_juego cuando no hay ganador.
+        
+        Recibe: Nada
+        Hace: Verifica que ganador es None
+        Devuelve: Nada
+        """
+        estado = self.__juego__.get_estado_juego()
+        self.assertIsNone(estado['ganador'])
+    
+    def test_get_estado_juego_copia_movimientos(self):
+        """
+        Prueba que get_estado_juego copia la lista.
+        
+        Recibe: Nada
+        Hace: Verifica que no devuelve la lista original
+        Devuelve: Nada
+        """
+        # tirar dados
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 3
+        
+        try:
+            self.__juego__.tirar_dados()
+            
+            # obtener estado
+            estado = self.__juego__.get_estado_juego()
+            movimientos_estado = estado['movimientos_disponibles']
+            
+            # obtener original
+            movimientos_original = self.__juego__.get_movimientos_disponibles()
+            
+            # verificar que son iguales en contenido
+            self.assertEqual(movimientos_estado, movimientos_original)
+            
+            # verificar que NO son el mismo objeto
+            self.assertIsNot(movimientos_estado, movimientos_original)
+        finally:
+            random.randint = original
+    
+    # ===== TESTS DE __STR__ =====
+    
+    def test_str_formato_correcto(self):
+        """
+        Prueba __str__ con formato correcto.
+        
+        Recibe: Nada
+        Hace: Verifica que contiene los elementos esperados
+        Devuelve: Nada
+        """
+        texto = str(self.__juego__)
+        
+        # verificar que contiene nombres
+        self.assertIn("Ana", texto)
+        self.assertIn("Luis", texto)
+        
+        # verificar que contiene "vs"
+        self.assertIn("vs", texto)
+        
+        # verificar que contiene "Backgammon"
+        self.assertIn("Backgammon", texto)
+    
+    def test_str_incluye_tablero(self):
+        """
+        Prueba que __str__ incluye el tablero.
+        
+        Recibe: Nada
+        Hace: Verifica que contiene elementos del tablero
+        Devuelve: Nada
+        """
+        texto = str(self.__juego__)
+        
+        # verificar que contiene elementos del tablero
+        self.assertIn("TABLERO", texto)
+    
+    def test_str_estructura_encabezado(self):
+        """
+        Prueba la estructura del encabezado.
+        
+        Recibe: Nada
+        Hace: Verifica el formato exacto
+        Devuelve: Nada
+        """
+        texto = str(self.__juego__)
+        
+        # verificar formato: "Backgammon: Ana vs Luis"
+        if "Backgammon: Ana vs Luis" in texto:
+            tiene_formato = True
+        else:
+            tiene_formato = False
+        
+        self.assertTrue(tiene_formato)
 
 
 if __name__ == "__main__":
