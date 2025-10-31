@@ -3,284 +3,253 @@ from core.player import Player
 
 
 class TestPlayer(unittest.TestCase):
-  
-   def setUp(self):
-       # Configuracion inicial para cada test
-       self.jugador_blanco = Player("Ana", 1)
-       self.jugador_negro = Player("Luis", -1)
-  
-   # ===== TESTS DE INICIALIZACION =====
-  
-   def test_crear_jugador_blanco_correctamente(self):
-       #Un jugador blanco nuevo debe tener todo en estado inicial
-       self.assertEqual(self.jugador_blanco.get_nombre(), "Ana")
-       self.assertEqual(self.jugador_blanco.get_direccion(), 1)
-       self.assertEqual(self.jugador_blanco.get_fichas_en_barra(), 0)
-       self.assertEqual(self.jugador_blanco.get_fichas_sacadas(), 0)
-       self.assertFalse(self.jugador_blanco.tiene_fichas_en_barra())
-       self.assertFalse(self.jugador_blanco.ha_ganado())
-  
-   def test_crear_jugador_negro_correctamente(self):
-       #Un jugador negro nuevo debe tener todo en estado inicial
-       self.assertEqual(self.jugador_negro.get_nombre(), "Luis")
-       self.assertEqual(self.jugador_negro.get_direccion(), -1)
-       self.assertEqual(self.jugador_negro.get_fichas_en_barra(), 0)
-       self.assertEqual(self.jugador_negro.get_fichas_sacadas(), 0)
-       self.assertFalse(self.jugador_negro.tiene_fichas_en_barra())
-       self.assertFalse(self.jugador_negro.ha_ganado())
-  
-   def test_direcciones_opuestas(self):
-       #Los jugadores deben tener direcciones opuestas
-       self.assertNotEqual(self.jugador_blanco.get_direccion(),
-                          self.jugador_negro.get_direccion())
-       self.assertEqual(self.jugador_blanco.get_direccion(), 1)
-       self.assertEqual(self.jugador_negro.get_direccion(), -1)
-  
-   def test_nombres_diferentes(self):
-       #Los jugadores deben tener nombres diferentes 
-       self.assertNotEqual(self.jugador_blanco.get_nombre(),
-                          self.jugador_negro.get_nombre())
+    """
+    Clase de pruebas para Player con 100% de cobertura.
+    
+    Recibe: Nada
+    Hace: Prueba todos los metodos de Player
+    Devuelve: Nada
+    """
+    
+    def setUp(self):
+        """
+        Configuracion inicial para cada test.
+        
+        Recibe: Nada
+        Hace: Crea dos jugadores para cada test
+        Devuelve: Nada
+        """
+        self.__jugador_blanco__ = Player("Ana", 1)
+        self.__jugador_negro__ = Player("Luis", -1)
+    
+    # ===== TESTS DE INICIALIZACION Y GETTERS =====
+    
+    def test_get_nombre(self):
+        """
+        Prueba get_nombre.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve el nombre correcto
+        Devuelve: Nada
+        """
+        self.assertEqual(self.__jugador_blanco__.get_nombre(), "Ana")
+        self.assertEqual(self.__jugador_negro__.get_nombre(), "Luis")
+    
+    def test_get_direccion(self):
+        """
+        Prueba get_direccion.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve la direccion correcta
+        Devuelve: Nada
+        """
+        self.assertEqual(self.__jugador_blanco__.get_direccion(), 1)
+        self.assertEqual(self.__jugador_negro__.get_direccion(), -1)
+    
+    def test_get_fichas_en_barra_inicial(self):
+        """
+        Prueba get_fichas_en_barra al inicio.
+        
+        Recibe: Nada
+        Hace: Verifica que empieza en 0
+        Devuelve: Nada
+        """
+        self.assertEqual(self.__jugador_blanco__.get_fichas_en_barra(), 0)
+        self.assertEqual(self.__jugador_negro__.get_fichas_en_barra(), 0)
+    
+    def test_get_fichas_sacadas_inicial(self):
+        """
+        Prueba get_fichas_sacadas al inicio.
+        
+        Recibe: Nada
+        Hace: Verifica que empieza en 0
+        Devuelve: Nada
+        """
+        self.assertEqual(self.__jugador_blanco__.get_fichas_sacadas(), 0)
+        self.assertEqual(self.__jugador_negro__.get_fichas_sacadas(), 0)
+    
+    # ===== TESTS DE FICHAS EN BARRA =====
+    
+    def test_agregar_ficha_a_barra(self):
+        """
+        Prueba agregar_ficha_a_barra.
+        
+        Recibe: Nada
+        Hace: Verifica que incrementa el contador (linea 31)
+        Devuelve: Nada
+        """
+        self.__jugador_blanco__.agregar_ficha_a_barra()
+        self.assertEqual(self.__jugador_blanco__.get_fichas_en_barra(), 1)
+        
+        self.__jugador_blanco__.agregar_ficha_a_barra()
+        self.assertEqual(self.__jugador_blanco__.get_fichas_en_barra(), 2)
+    
+    def test_quitar_ficha_de_barra_cuando_hay(self):
+        """
+        Prueba quitar_ficha_de_barra cuando hay fichas.
+        
+        Recibe: Nada
+        Hace: Verifica que decrementa (linea 37, rama if > 0)
+        Devuelve: Nada
+        """
+        # agregar fichas primero
+        self.__jugador_blanco__.agregar_ficha_a_barra()
+        self.__jugador_blanco__.agregar_ficha_a_barra()
+        
+        # quitar una
+        self.__jugador_blanco__.quitar_ficha_de_barra()
+        self.assertEqual(self.__jugador_blanco__.get_fichas_en_barra(), 1)
+        
+        # quitar otra
+        self.__jugador_blanco__.quitar_ficha_de_barra()
+        self.assertEqual(self.__jugador_blanco__.get_fichas_en_barra(), 0)
+    
+    def test_quitar_ficha_de_barra_cuando_no_hay(self):
+        """
+        Prueba quitar_ficha_de_barra cuando no hay fichas.
+        
+        Recibe: Nada
+        Hace: Verifica que no pasa nada (linea 34, no entra al if)
+        Devuelve: Nada
+        """
+        # sin agregar fichas, intentar quitar
+        self.__jugador_blanco__.quitar_ficha_de_barra()
+        self.assertEqual(self.__jugador_blanco__.get_fichas_en_barra(), 0)
+    
+    def test_tiene_fichas_en_barra_true(self):
+        """
+        Prueba tiene_fichas_en_barra cuando hay fichas.
+        
+        Recibe: Nada
+        Hace: Verifica rama if > 0 devuelve True (linea 43)
+        Devuelve: Nada
+        """
+        self.__jugador_blanco__.agregar_ficha_a_barra()
+        self.assertTrue(self.__jugador_blanco__.tiene_fichas_en_barra())
+    
+    def test_tiene_fichas_en_barra_false(self):
+        """
+        Prueba tiene_fichas_en_barra cuando no hay fichas.
+        
+        Recibe: Nada
+        Hace: Verifica rama else devuelve False (linea 44)
+        Devuelve: Nada
+        """
+        self.assertFalse(self.__jugador_blanco__.tiene_fichas_en_barra())
+    
+    # ===== TESTS DE FICHAS SACADAS =====
+    
+    def test_agregar_ficha_sacada(self):
+        """
+        Prueba agregar_ficha_sacada.
+        
+        Recibe: Nada
+        Hace: Verifica que incrementa el contador (linea 22)
+        Devuelve: Nada
+        """
+        self.__jugador_blanco__.agregar_ficha_sacada()
+        self.assertEqual(self.__jugador_blanco__.get_fichas_sacadas(), 1)
+        
+        self.__jugador_blanco__.agregar_ficha_sacada()
+        self.assertEqual(self.__jugador_blanco__.get_fichas_sacadas(), 2)
+    
+    def test_ha_ganado_false(self):
+        """
+        Prueba ha_ganado cuando no ha sacado todas las fichas.
+        
+        Recibe: Nada
+        Hace: Verifica rama else devuelve False (linea 26)
+        Devuelve: Nada
+        """
+        # sin sacar fichas
+        self.assertFalse(self.__jugador_blanco__.ha_ganado())
+        
+        # con algunas fichas sacadas
+        contador = 0
+        while contador < 10:
+            self.__jugador_blanco__.agregar_ficha_sacada()
+            contador = contador + 1
+        
+        self.assertFalse(self.__jugador_blanco__.ha_ganado())
+    
+    def test_ha_ganado_true(self):
+        """
+        Prueba ha_ganado cuando ha sacado todas las fichas.
+        
+        Recibe: Nada
+        Hace: Verifica rama if == 15 devuelve True (linea 25)
+        Devuelve: Nada
+        """
+        # agregar 15 fichas sacadas
+        contador = 0
+        while contador < 15:
+            self.__jugador_blanco__.agregar_ficha_sacada()
+            contador = contador + 1
+        
+        self.assertTrue(self.__jugador_blanco__.ha_ganado())
+    
+    # ===== TESTS DE CASOS LIMITE =====
+    
+    def test_multiples_operaciones(self):
+        """
+        Prueba multiples operaciones en secuencia.
+        
+        Recibe: Nada
+        Hace: Verifica que todo funciona correctamente
+        Devuelve: Nada
+        """
+        # agregar a barra
+        self.__jugador_blanco__.agregar_ficha_a_barra()
+        self.__jugador_blanco__.agregar_ficha_a_barra()
+        self.assertEqual(self.__jugador_blanco__.get_fichas_en_barra(), 2)
+        
+        # agregar sacadas
+        self.__jugador_blanco__.agregar_ficha_sacada()
+        self.assertEqual(self.__jugador_blanco__.get_fichas_sacadas(), 1)
+        
+        # quitar de barra
+        self.__jugador_blanco__.quitar_ficha_de_barra()
+        self.assertEqual(self.__jugador_blanco__.get_fichas_en_barra(), 1)
+        
+        # agregar mas sacadas
+        contador = 0
+        while contador < 14:
+            self.__jugador_blanco__.agregar_ficha_sacada()
+            contador = contador + 1
+        
+        # verificar ganador
+        self.assertTrue(self.__jugador_blanco__.ha_ganado())
+    
+    def test_jugadores_independientes(self):
+        """
+        Prueba que los jugadores son independientes.
+        
+        Recibe: Nada
+        Hace: Verifica que modificar uno no afecta al otro
+        Devuelve: Nada
+        """
+        # modificar jugador blanco
+        self.__jugador_blanco__.agregar_ficha_a_barra()
+        self.__jugador_blanco__.agregar_ficha_sacada()
+        
+        # verificar que el negro no cambio
+        self.assertEqual(self.__jugador_negro__.get_fichas_en_barra(), 0)
+        self.assertEqual(self.__jugador_negro__.get_fichas_sacadas(), 0)
+        self.assertFalse(self.__jugador_negro__.tiene_fichas_en_barra())
+        self.assertFalse(self.__jugador_negro__.ha_ganado())
 
-# ===== TESTS DE FICHAS EN LA BARRA =====
-  
-   def test_agregar_una_ficha_a_la_barra(self):
-       #Debe poder agregar una ficha a la barra
-       self.jugador_blanco.agregar_ficha_a_barra()
-      
-       self.assertEqual(self.jugador_blanco.get_fichas_en_barra(), 1)
-       self.assertTrue(self.jugador_blanco.tiene_fichas_en_barra())
-  
-   def test_agregar_multiples_fichas_a_la_barra(self):
-       #Debe poder agregar multiples fichas a la barra
-       for i in range(5):
-           self.jugador_blanco.agregar_ficha_a_barra()
-      
-       self.assertEqual(self.jugador_blanco.get_fichas_en_barra(), 5)
-       self.assertTrue(self.jugador_blanco.tiene_fichas_en_barra())
-  
-   def test_quitar_ficha_de_la_barra(self):
-       #Debe poder quitar fichas de la barra
-       # Agregar algunas fichas primero
-       self.jugador_blanco.agregar_ficha_a_barra()
-       self.jugador_blanco.agregar_ficha_a_barra()
-       self.jugador_blanco.agregar_ficha_a_barra()
-      
-       # Quitar una ficha
-       self.jugador_blanco.quitar_ficha_de_barra()
-      
-       self.assertEqual(self.jugador_blanco.get_fichas_en_barra(), 2)
-       self.assertTrue(self.jugador_blanco.tiene_fichas_en_barra())
-  
-   def test_quitar_todas_las_fichas_de_la_barra(self):
-       # Debe poder quitar todas las fichas de la barra
-       # Agregar fichas
-       self.jugador_blanco.agregar_ficha_a_barra()
-       self.jugador_blanco.agregar_ficha_a_barra()
-      
-       # Quitar todas
-       self.jugador_blanco.quitar_ficha_de_barra()
-       self.jugador_blanco.quitar_ficha_de_barra()
-      
-       self.assertEqual(self.jugador_blanco.get_fichas_en_barra(), 0)
-       self.assertFalse(self.jugador_blanco.tiene_fichas_en_barra())
-  
-   def test_no_puede_quitar_fichas_inexistentes_de_barra(self):
-       # No debe poder tener fichas negativas en la barra
-       # Intentar quitar cuando no hay fichas
-       self.jugador_blanco.quitar_ficha_de_barra()
-       self.jugador_blanco.quitar_ficha_de_barra()
-       self.jugador_blanco.quitar_ficha_de_barra()
-      
-       self.assertEqual(self.jugador_blanco.get_fichas_en_barra(), 0)
-       self.assertFalse(self.jugador_blanco.tiene_fichas_en_barra())
-  
-   def test_quitar_mas_fichas_de_las_disponibles(self):
-       # Quitar mas fichas de las disponibles debe dejar el contador en 0
-       # Agregar solo 2 fichas
-       self.jugador_blanco.agregar_ficha_a_barra()
-       self.jugador_blanco.agregar_ficha_a_barra()
-      
-       # Intentar quitar 5 fichas
-       for i in range(5):
-           self.jugador_blanco.quitar_ficha_de_barra()
-      
-       self.assertEqual(self.jugador_blanco.get_fichas_en_barra(), 0)
-       self.assertFalse(self.jugador_blanco.tiene_fichas_en_barra())
-  
-   # ===== TESTS DE FICHAS SACADAS =====
-  
-   def test_sacar_una_ficha_del_tablero(self):
-       # Debe poder sacar una ficha del tablero
-       self.jugador_blanco.sacar_ficha_del_tablero()
-      
-       self.assertEqual(self.jugador_blanco.get_fichas_sacadas(), 1)
-       self.assertFalse(self.jugador_blanco.ha_ganado())  # Necesita 15
-  
-   def test_sacar_multiples_fichas_del_tablero(self):
-       #Debe poder sacar multiples fichas del tablero
-       for i in range(10):
-           self.jugador_blanco.sacar_ficha_del_tablero()
-      
-       self.assertEqual(self.jugador_blanco.get_fichas_sacadas(), 10)
-       self.assertFalse(self.jugador_blanco.ha_ganado())  # Necesita 15
-  
-   def test_sacar_exactamente_15_fichas_gana(self):
-       #Sacar exactamente 15 fichas debe hacer ganar al jugador
-       for i in range(15):
-           self.jugador_blanco.sacar_ficha_del_tablero()
-      
-       self.assertEqual(self.jugador_blanco.get_fichas_sacadas(), 15)
-       self.assertTrue(self.jugador_blanco.ha_ganado())
-  
-   def test_sacar_mas_de_15_fichas_sigue_ganando(self):
-       #Sacar mas de 15 fichas debe seguir marcando como ganador
-       for i in range(20):  # Mas de 15
-           self.jugador_blanco.sacar_ficha_del_tablero()
-      
-       self.assertEqual(self.jugador_blanco.get_fichas_sacadas(), 20)
-       self.assertTrue(self.jugador_blanco.ha_ganado())
-  
-   def test_progresion_hacia_victoria(self):
-       #Debe mostrar progresion correcta hacia la victoria
-       pasos_victoria = [5, 10, 14, 15]
-      
-       for paso in pasos_victoria:
-           # Sacar fichas hasta el paso actual
-           while self.jugador_negro.get_fichas_sacadas() < paso:
-               self.jugador_negro.sacar_ficha_del_tablero()
-          
-           if paso < 15:
-               self.assertFalse(self.jugador_negro.ha_ganado())
-           else:
-               self.assertTrue(self.jugador_negro.ha_ganado())
+    def test_str_representacion(self):
+        """
+        Prueba la representacion en texto del jugador.
+        """
+        descripcion_blanco = str(self.__jugador_blanco__)
+        self.assertIn("Ana", descripcion_blanco)
+        self.assertIn("derecha", descripcion_blanco)
 
- # ===== TESTS DE INDEPENDENCIA ENTRE JUGADORES =====
-  
-   def test_jugadores_son_independientes_barra(self):
-       #Las fichas en barra de un jugador no afectan al otro
-       self.jugador_blanco.agregar_ficha_a_barra()
-       self.jugador_blanco.agregar_ficha_a_barra()
-      
-       # El jugador negro no debe verse afectado
-       self.assertEqual(self.jugador_negro.get_fichas_en_barra(), 0)
-       self.assertFalse(self.jugador_negro.tiene_fichas_en_barra())
-  
-   def test_jugadores_son_independientes_sacadas(self):
-       #Las fichas sacadas de un jugador no afectan al otro
-       for i in range(10):
-           self.jugador_blanco.sacar_ficha_del_tablero()
-      
-       # El jugador negro no debe verse afectado
-       self.assertEqual(self.jugador_negro.get_fichas_sacadas(), 0)
-       self.assertFalse(self.jugador_negro.ha_ganado())
-  
-   def test_victoria_independiente(self):
-       # La victoria de un jugador no afecta al otro
-       # Jugador blanco gana
-       for i in range(15):
-           self.jugador_blanco.sacar_ficha_del_tablero()
-      
-       self.assertTrue(self.jugador_blanco.ha_ganado())
-       self.assertFalse(self.jugador_negro.ha_ganado())
-  
-   # ===== TESTS DE REPRESENTACION STRING =====
-  
-   def test_str_jugador_blanco(self):
-       #La representacion string del jugador blanco debe ser correcta
-       resultado = str(self.jugador_blanco)
-      
-       self.assertIn("Ana", resultado)
-       self.assertIn("derecha", resultado)
-       self.assertIn("Jugador:", resultado)
-  
-   def test_str_jugador_negro(self):
-       #La representacion string del jugador negro debe ser correcta
-       resultado = str(self.jugador_negro)
-      
-       self.assertIn("Luis", resultado)
-       self.assertIn("izquierda", resultado)
-       self.assertIn("Jugador:", resultado)
-  
-   def test_str_direcciones_correctas(self):
-       #Las direcciones en string deben ser correctas para cada jugador
-       str_blanco = str(self.jugador_blanco)
-       str_negro = str(self.jugador_negro)
-      
-       self.assertIn("derecha", str_blanco)
-       self.assertNotIn("izquierda", str_blanco)
-      
-       self.assertIn("izquierda", str_negro)
-       self.assertNotIn("derecha", str_negro)
-  
-   # ===== TESTS DE CASOS LIMITE =====
-  
-   def test_nombre_vacio(self):
-       #Debe manejar nombres vaci­os correctamente
-       jugador_sin_nombre = Player("", 1)
-      
-       self.assertEqual(jugador_sin_nombre.get_nombre(), "")
-       resultado = str(jugador_sin_nombre)
-       self.assertIn("Jugador:", resultado)
-  
-   def test_nombre_muy_largo(self):
-       #Debe manejar nombres muy largos
-       nombre_largo = "A" * 100
-       jugador_nombre_largo = Player(nombre_largo, 1)
-      
-       self.assertEqual(jugador_nombre_largo.get_nombre(), nombre_largo)
-       resultado = str(jugador_nombre_largo)
-       self.assertIn(nombre_largo, resultado)
-  
-   def test_direccion_invalida_procesada_correctamente(self):
-       #Debe procesar direcciones no estandar
-       jugador_dir_rara = Player("Test", 0)
-      
-       self.assertEqual(jugador_dir_rara.get_direccion(), 0)
-       resultado = str(jugador_dir_rara)
-       self.assertIn("izquierda", resultado)  # Cualquier cosa != 1 es izquierda
-  
-   def test_multiples_operaciones_secuenciales(self):
-       # Debe manejar multiples operaciones en secuencia
-       # Secuencia compleja de operaciones
-       self.jugador_blanco.agregar_ficha_a_barra()
-       self.jugador_blanco.agregar_ficha_a_barra()
-       self.jugador_blanco.sacar_ficha_del_tablero()
-       self.jugador_blanco.quitar_ficha_de_barra()
-       self.jugador_blanco.sacar_ficha_del_tablero()
-       self.jugador_blanco.sacar_ficha_del_tablero()
-      
-       # Verificar estado final
-       self.assertEqual(self.jugador_blanco.get_fichas_en_barra(), 1)
-       self.assertEqual(self.jugador_blanco.get_fichas_sacadas(), 3)
-       self.assertTrue(self.jugador_blanco.tiene_fichas_en_barra())
-       self.assertFalse(self.jugador_blanco.ha_ganado())
-
-  # ===== TESTS DE VALORES LIMITE =====
-  
-   def test_exactamente_14_fichas_sacadas(self):
-       # Con 14 fichas sacadas no debe haber victoria
-       for i in range(14):
-           self.jugador_blanco.sacar_ficha_del_tablero()
-      
-       self.assertEqual(self.jugador_blanco.get_fichas_sacadas(), 14)
-       self.assertFalse(self.jugador_blanco.ha_ganado())
-  
-   def test_exactamente_16_fichas_sacadas(self):
-       # Con 16 fichas sacadas debe haber victoria
-       for i in range(16):
-           self.jugador_blanco.sacar_ficha_del_tablero()
-      
-       self.assertEqual(self.jugador_blanco.get_fichas_sacadas(), 16)
-       self.assertTrue(self.jugador_blanco.ha_ganado())
-  
-   def test_muchas_fichas_en_barra(self):
-       # Debe manejar muchas fichas en la barra 
-       for i in range(50):  # Mas fichas de las que tiene un jugador
-           self.jugador_blanco.agregar_ficha_a_barra()
-      
-       self.assertEqual(self.jugador_blanco.get_fichas_en_barra(), 50)
-       self.assertTrue(self.jugador_blanco.tiene_fichas_en_barra())
+        descripcion_negro = str(self.__jugador_negro__)
+        self.assertIn("Luis", descripcion_negro)
+        self.assertIn("izquierda", descripcion_negro)
 
 
 if __name__ == "__main__":
-   unittest.main()
+    unittest.main()

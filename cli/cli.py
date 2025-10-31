@@ -19,6 +19,20 @@ class CLI:
         Devuelve: Nada
         """
         self.__juego__ = None
+
+    def __get_juego_privado(self):
+        """
+        getter interno para exponer el atributo privado en tests.
+        """
+        return self.__juego__
+
+    def __set_juego_privado(self, juego):
+        """
+        setter interno para permitir inyectar un juego simulado en tests.
+        """
+        self.__juego__ = juego
+
+    _CLI__juego__ = property(__get_juego_privado, __set_juego_privado)
     
     def mostrar_bienvenida(self):
         """

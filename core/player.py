@@ -29,6 +29,12 @@ class Player:
 
    def sacar_ficha_del_tablero(self):
        self.__fichas_sacadas__ = self.__fichas_sacadas__ + 1
+
+   def agregar_ficha_sacada(self):
+       """
+       Incrementa el contador de fichas sacadas. Alias usado en tests.
+       """
+       self.sacar_ficha_del_tablero()
   
    def tiene_fichas_en_barra(self):
        return self.__fichas_en_barra__ > 0

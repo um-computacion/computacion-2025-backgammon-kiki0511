@@ -233,3 +233,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - He creado varios Fix donde arreglo clase game;  y ademas agrego varios Docstrings.
+
+#### [0.4.5] - 2024-10-23
+
+### Added
+- He creado varios Fix donde arreglo clase ;  y ademas agrego varios Docstrings.
+
+#### [0.4.6] - 2024-10-25
+
+### Added
+- Cree los test de la clase cli. 
+
+#### [0.4.7] - 2024-15-27
+
+### Added
+- Mejoro la cobertura de las clases.
+
+
