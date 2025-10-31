@@ -23,6 +23,23 @@ class TestBackgammonGame(unittest.TestCase):
         """
         self.__juego__ = BackgammonGame("Ana", "Luis")
     
+    def limpiar_tablero(self):
+        """
+        Limpia todas las fichas del tablero.
+        
+        Recibe: Nada
+        Hace: Deja todos los puntos sin fichas para preparar escenarios
+        Devuelve: Board que representa el tablero ya limpio
+        """
+        tablero = self.__juego__.get_tablero()
+        punto = 0
+        while punto < 26:
+            fichas = tablero.get_fichas_en_punto(punto)
+            while len(fichas) > 0:
+                fichas.pop()
+            punto = punto + 1
+        return tablero
+    
     # ===== TESTS DE INICIALIZACION =====
     
     def test_init_crea_juego_correctamente(self):
@@ -291,6 +308,402 @@ class TestBackgammonGame(unittest.TestCase):
             self.assertFalse(resultado)
         finally:
             random.randint = original
+
+    def test_hacer_movimiento_bear_off_blanco_incrementa_contador(self):
+        """
+        Prueba bear off exitoso incrementando fichas sacadas.
+        
+        Recibe: Nada
+        Hace: Verifica que el jugador blanco suma una ficha al sacar
+        Devuelve: Nada
+        """
+        tablero = self.limpiar_tablero()
+        ficha = Checker('blanco')
+        ficha.set_posicion(2)
+        tablero.get_fichas_en_punto(2).append(ficha)
+        
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 2
+        
+        try:
+            self.__juego__.tirar_dados()
+            fichas_antes = self.__juego__.get_jugador1().get_fichas_sacadas()
+            resultado = self.__juego__.hacer_movimiento(2, 2)
+            fichas_despues = self.__juego__.get_jugador1().get_fichas_sacadas()
+            
+            self.assertTrue(resultado)
+            self.assertEqual(fichas_despues, fichas_antes + 1)
+        finally:
+            random.randint = original
+
+    def test_hacer_movimiento_bear_off_blanco_sobra(self):
+        """
+        Prueba bear off blanco con dado mayor que el necesario.
+        
+        Recibe: Nada
+        Hace: Verifica que se permite sacar ficha cuando no hay otras mas lejos
+        Devuelve: Nada
+        """
+        tablero = self.limpiar_tablero()
+        ficha = Checker('blanco')
+        ficha.set_posicion(4)
+        tablero.get_fichas_en_punto(4).append(ficha)
+        
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 6
+        
+        try:
+            self.__juego__.tirar_dados()
+            resultado = self.__juego__.hacer_movimiento(4, 6)
+            self.assertTrue(resultado)
+        finally:
+            random.randint = original
+    
+    def test_hacer_movimiento_exitoso_agota_dados(self):
+        """
+        Prueba movimiento valido que consume el unico dado y cierra el turno.
+        
+        Recibe: Nada
+        Hace: Verifica que al quedar sin dados se llama a terminar_turno
+        Devuelve: Nada
+        """
+        tablero = self.limpiar_tablero()
+        ficha = Checker('blanco')
+        ficha.set_posicion(6)
+        tablero.get_fichas_en_punto(6).append(ficha)
+        
+        # agregar ficha negra para que la partida siga
+        ficha_negra = Checker('negro')
+        ficha_negra.set_posicion(12)
+        tablero.get_fichas_en_punto(12).append(ficha_negra)
+        
+        movimientos = self.__juego__.get_movimientos_disponibles()
+        movimientos.clear()
+        movimientos.append(3)
+        
+        jugador_antes = self.__juego__.get_jugador_actual()
+        resultado = self.__juego__.hacer_movimiento(6, 3)
+        jugador_despues = self.__juego__.get_jugador_actual()
+        
+        self.assertTrue(resultado)
+        self.assertNotEqual(jugador_antes, jugador_despues)
+        self.assertEqual(len(self.__juego__.get_movimientos_disponibles()), 0)
+
+    def test_hacer_movimiento_invalido_consumiendo_ultimo_dado(self):
+        """
+        Prueba movimiento invalido consumiendo el ultimo dado.
+        
+        Recibe: Nada
+        Hace: Verifica que termina el turno y vacia movimientos
+        Devuelve: Nada
+        """
+        movimientos = self.__juego__.get_movimientos_disponibles()
+        while len(movimientos) > 0:
+            movimientos.pop()
+        movimientos.append(4)
+        
+        jugador_antes = self.__juego__.get_jugador_actual()
+        resultado = self.__juego__.hacer_movimiento(5, 4)
+        jugador_despues = self.__juego__.get_jugador_actual()
+        
+        self.assertFalse(resultado)
+        self.assertEqual(len(self.__juego__.get_movimientos_disponibles()), 0)
+        self.assertNotEqual(jugador_antes, jugador_despues)
+    
+    def test_hacer_movimiento_falla_en_tablero_despues_validar(self):
+        """
+        Prueba hacer_movimiento cuando el tablero falla al mover.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve False si mover_ficha falla
+        Devuelve: Nada
+        """
+        tablero = self.limpiar_tablero()
+        ficha = Checker('blanco')
+        ficha.set_posicion(6)
+        tablero.get_fichas_en_punto(6).append(ficha)
+        
+        ficha_negra = Checker('negro')
+        ficha_negra.set_posicion(12)
+        tablero.get_fichas_en_punto(12).append(ficha_negra)
+        
+        original = tablero.mover_ficha
+        tablero.mover_ficha = lambda origen, destino, color: False
+        
+        movimientos = self.__juego__.get_movimientos_disponibles()
+        movimientos.clear()
+        movimientos.append(3)
+        
+        try:
+            resultado = self.__juego__.hacer_movimiento(6, 3)
+            self.assertFalse(resultado)
+        finally:
+            tablero.mover_ficha = original
+
+    def test_hacer_movimiento_bear_off_negro_sobra(self):
+        """
+        Prueba bear off negro con dado mayor permitido.
+        
+        Recibe: Nada
+        Hace: Verifica que permite sacar ficha cuando no hay otras mas lejos
+        Devuelve: Nada
+        """
+        self.__juego__.terminar_turno()
+        tablero = self.limpiar_tablero()
+        
+        ficha = Checker('negro')
+        ficha.set_posicion(21)
+        tablero.get_fichas_en_punto(21).append(ficha)
+        
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 5
+        
+        try:
+            self.__juego__.tirar_dados()
+            resultado = self.__juego__.hacer_movimiento(21, 5)
+            self.assertTrue(resultado)
+        finally:
+            random.randint = original
+
+    def test_puede_hacer_movimiento_bear_off_blanco_exact(self):
+        """
+        Prueba bear off exacto para jugador blanco.
+        
+        Recibe: Nada
+        Hace: Verifica que puede sacar ficha con dado exacto
+        Devuelve: Nada
+        """
+        tablero = self.limpiar_tablero()
+        ficha = Checker('blanco')
+        ficha.set_posicion(2)
+        tablero.get_fichas_en_punto(2).append(ficha)
+        
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 2
+        
+        try:
+            self.__juego__.tirar_dados()
+            resultado = self.__juego__.puede_hacer_movimiento(2, 2)
+            self.assertTrue(resultado)
+        finally:
+            random.randint = original
+
+    def test_puede_hacer_movimiento_bear_off_blanco_bloqueado(self):
+        """
+        Prueba bear off con dado grande pero otra ficha mas atras.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve False cuando hay fichas en puntos mayores
+        Devuelve: Nada
+        """
+        tablero = self.limpiar_tablero()
+        ficha_base = Checker('blanco')
+        ficha_base.set_posicion(1)
+        tablero.get_fichas_en_punto(1).append(ficha_base)
+        
+        ficha_extra = Checker('blanco')
+        ficha_extra.set_posicion(3)
+        tablero.get_fichas_en_punto(3).append(ficha_extra)
+        
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 6
+        
+        try:
+            self.__juego__.tirar_dados()
+            resultado = self.__juego__.puede_hacer_movimiento(1, 6)
+            self.assertFalse(resultado)
+        finally:
+            random.randint = original
+
+    def test_puede_hacer_movimiento_bear_off_blanco_sobra_true(self):
+        """
+        Prueba bear off con dado mayor permitido.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve True cuando no hay fichas mas alejadas
+        Devuelve: Nada
+        """
+        tablero = self.limpiar_tablero()
+        ficha = Checker('blanco')
+        ficha.set_posicion(3)
+        tablero.get_fichas_en_punto(3).append(ficha)
+        
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 5
+        
+        try:
+            self.__juego__.tirar_dados()
+            resultado = self.__juego__.puede_hacer_movimiento(3, 5)
+            self.assertTrue(resultado)
+        finally:
+            random.randint = original
+    
+    def test_puede_hacer_movimiento_bear_off_blanco_sin_otras_blancas(self):
+        """
+        Prueba bear off blanco revisando puntos sin fichas del mismo color.
+        
+        Recibe: Nada
+        Hace: Verifica que recorre la lista de fichas y permite sacar
+        Devuelve: Nada
+        """
+        tablero = self.limpiar_tablero()
+        
+        # ficha blanca lista para salir
+        ficha_blanca = Checker('blanco')
+        ficha_blanca.set_posicion(3)
+        tablero.get_fichas_en_punto(3).append(ficha_blanca)
+        
+        # ficha negra en punto superior para recorrer el while
+        ficha_negra = Checker('negro')
+        ficha_negra.set_posicion(4)
+        tablero.get_fichas_en_punto(4).append(ficha_negra)
+        
+        movimientos = self.__juego__.get_movimientos_disponibles()
+        movimientos.clear()
+        movimientos.append(5)
+        
+        resultado = self.__juego__.puede_hacer_movimiento(3, 5)
+        self.assertTrue(resultado)
+
+    def test_puede_hacer_movimiento_bear_off_negro_exact(self):
+        """
+        Prueba bear off exacto para jugador negro.
+        
+        Recibe: Nada
+        Hace: Verifica que puede sacar ficha con dado exacto
+        Devuelve: Nada
+        """
+        self.__juego__.terminar_turno()
+        tablero = self.limpiar_tablero()
+        
+        ficha = Checker('negro')
+        ficha.set_posicion(23)
+        tablero.get_fichas_en_punto(23).append(ficha)
+        
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 2
+        
+        try:
+            self.__juego__.tirar_dados()
+            resultado = self.__juego__.puede_hacer_movimiento(23, 2)
+            self.assertTrue(resultado)
+        finally:
+            random.randint = original
+
+    def test_puede_hacer_movimiento_bear_off_negro_sobra_true(self):
+        """
+        Prueba bear off negro con dado mayor permitido.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve True cuando no hay fichas mas atras
+        Devuelve: Nada
+        """
+        self.__juego__.terminar_turno()
+        tablero = self.limpiar_tablero()
+        
+        ficha = Checker('negro')
+        ficha.set_posicion(22)
+        tablero.get_fichas_en_punto(22).append(ficha)
+        
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 5
+        
+        try:
+            self.__juego__.tirar_dados()
+            resultado = self.__juego__.puede_hacer_movimiento(22, 5)
+            self.assertTrue(resultado)
+        finally:
+            random.randint = original
+    
+    def test_puede_hacer_movimiento_bear_off_negro_sin_otras_negras(self):
+        """
+        Prueba bear off negro recorriendo fichas sin encontrar propias.
+        
+        Recibe: Nada
+        Hace: Verifica que se permite sacar cuando solo hay fichas rivales
+        Devuelve: Nada
+        """
+        self.__juego__.terminar_turno()
+        tablero = self.limpiar_tablero()
+        
+        ficha_negra = Checker('negro')
+        ficha_negra.set_posicion(22)
+        tablero.get_fichas_en_punto(22).append(ficha_negra)
+        
+        ficha_blanca = Checker('blanco')
+        ficha_blanca.set_posicion(23)
+        tablero.get_fichas_en_punto(23).append(ficha_blanca)
+        
+        movimientos = self.__juego__.get_movimientos_disponibles()
+        movimientos.clear()
+        movimientos.append(5)
+        
+        resultado = self.__juego__.puede_hacer_movimiento(22, 5)
+        self.assertTrue(resultado)
+
+    def test_puede_hacer_movimiento_bear_off_negro_bloqueado(self):
+        """
+        Prueba bear off negro con dado grande y fichas adelante.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve False cuando hay fichas por delante
+        Devuelve: Nada
+        """
+        self.__juego__.terminar_turno()
+        tablero = self.limpiar_tablero()
+        
+        ficha_base = Checker('negro')
+        ficha_base.set_posicion(22)
+        tablero.get_fichas_en_punto(22).append(ficha_base)
+        
+        ficha_extra = Checker('negro')
+        ficha_extra.set_posicion(24)
+        tablero.get_fichas_en_punto(24).append(ficha_extra)
+        
+        import random
+        original = random.randint
+        random.randint = lambda a, b: 4
+        
+        try:
+            self.__juego__.tirar_dados()
+            resultado = self.__juego__.puede_hacer_movimiento(22, 4)
+            self.assertFalse(resultado)
+        finally:
+            random.randint = original
+    
+    def test_puede_hacer_movimiento_bear_off_negro_no_puede_sacar(self):
+        """
+        Prueba bear off negro cuando tiene fichas fuera del sector final.
+        
+        Recibe: Nada
+        Hace: Verifica que devuelve False si no puede sacar fichas
+        Devuelve: Nada
+        """
+        self.__juego__.terminar_turno()
+        tablero = self.limpiar_tablero()
+        
+        ficha_principal = Checker('negro')
+        ficha_principal.set_posicion(22)
+        tablero.get_fichas_en_punto(22).append(ficha_principal)
+        
+        ficha_lejana = Checker('negro')
+        ficha_lejana.set_posicion(10)
+        tablero.get_fichas_en_punto(10).append(ficha_lejana)
+        
+        movimientos = self.__juego__.get_movimientos_disponibles()
+        movimientos.clear()
+        movimientos.append(4)
+        
+        resultado = self.__juego__.puede_hacer_movimiento(22, 4)
+        self.assertFalse(resultado)
     
     def test_puede_hacer_movimiento_desde_barra_destino_fuera_rango(self):
         """
@@ -325,6 +738,21 @@ class TestBackgammonGame(unittest.TestCase):
             self.assertFalse(resultado)
         finally:
             random.randint = original
+    
+    def test_puede_hacer_movimiento_destino_fuera_rango_dado_negativo(self):
+        """
+        Prueba movimiento con dado negativo que deja destino fuera de rango.
+        
+        Recibe: Nada
+        Hace: Verifica que detecta destino invalido antes de mover
+        Devuelve: Nada
+        """
+        movimientos = self.__juego__.get_movimientos_disponibles()
+        movimientos.clear()
+        movimientos.append(-3)
+        
+        resultado = self.__juego__.puede_hacer_movimiento(24, -3)
+        self.assertFalse(resultado)
     
     def test_puede_hacer_movimiento_desde_barra_puede_mover(self):
         """
@@ -537,8 +965,7 @@ class TestBackgammonGame(unittest.TestCase):
         Hace: Verifica que devuelve True
         Devuelve: Nada
         """
-        # poner ficha en barra
-        tablero = self.__juego__.get_tablero()
+        tablero = self.limpiar_tablero()
         ficha = Checker('blanco')
         ficha.set_posicion(0)
         tablero.get_fichas_en_punto(0).append(ficha)
@@ -595,10 +1022,18 @@ class TestBackgammonGame(unittest.TestCase):
                 lista.pop()
             punto = punto + 1
         
-        # poner una ficha blanca en punto 1
+        # poner una ficha blanca en punto 13
         ficha = Checker('blanco')
-        ficha.set_posicion(1)
-        tablero.get_fichas_en_punto(1).append(ficha)
+        ficha.set_posicion(13)
+        tablero.get_fichas_en_punto(13).append(ficha)
+        
+        # bloquear el destino (punto 7) con dos fichas negras
+        contador_bloqueo = 0
+        while contador_bloqueo < 2:
+            ficha_negra = Checker('negro')
+            ficha_negra.set_posicion(7)
+            tablero.get_fichas_en_punto(7).append(ficha_negra)
+            contador_bloqueo = contador_bloqueo + 1
         
         # tirar dado grande
         import random
@@ -652,8 +1087,7 @@ class TestBackgammonGame(unittest.TestCase):
             
             # hacer movimiento desde barra
             resultado = self.__juego__.hacer_movimiento(0, 3)
-            # puede ser True o False
-            self.assertIsNotNone(resultado)
+            self.assertTrue(resultado)
         finally:
             random.randint = original
     
@@ -668,8 +1102,7 @@ class TestBackgammonGame(unittest.TestCase):
         # cambiar a jugador negro
         self.__juego__.terminar_turno()
         
-        # poner ficha negra en barra
-        tablero = self.__juego__.get_tablero()
+        tablero = self.limpiar_tablero()
         ficha = Checker('negro')
         ficha.set_posicion(0)
         tablero.get_fichas_en_punto(0).append(ficha)
@@ -684,8 +1117,7 @@ class TestBackgammonGame(unittest.TestCase):
             
             # hacer movimiento desde barra
             resultado = self.__juego__.hacer_movimiento(0, 3)
-            # puede ser True o False
-            self.assertIsNotNone(resultado)
+            self.assertTrue(resultado)
         finally:
             random.randint = original
     
@@ -957,10 +1389,8 @@ class TestBackgammonGame(unittest.TestCase):
         self.assertTrue(self.__juego__.esta_terminado())
         
         # verificar que NO se cambio el jugador 
-        # (porque se ejecuta verificar_victoria antes de cambiar)
-        # y si el juego termina, no cambia
-        # Nota: en este caso si cambia porque verifica victoria
-        # DESPUES cambia el jugador solo si NO esta terminado
+        # (porque verificar_victoria deja terminado el juego)
+        self.assertEqual(self.__juego__.get_jugador_actual(), jugador_actual)
     
     # ===== TESTS DE VERIFICAR_VICTORIA =====
     
@@ -990,6 +1420,26 @@ class TestBackgammonGame(unittest.TestCase):
         # verificar ganador
         ganador = self.__juego__.get_ganador()
         self.assertEqual(ganador, self.__juego__.get_jugador1())
+
+    def test_verificar_victoria_blanco_no_gana_si_negro_tiene_barra(self):
+        """
+        Prueba que blanco no gana si el negro tiene fichas en barra.
+        
+        Recibe: Nada
+        Hace: Verifica que se omite la victoria por ficha rival en barra
+        Devuelve: Nada
+        """
+        tablero = self.limpiar_tablero()
+        
+        # negro con una ficha en la barra
+        ficha_negra = Checker('negro')
+        ficha_negra.set_posicion(0)
+        tablero.get_fichas_en_punto(0).append(ficha_negra)
+        
+        self.__juego__.verificar_victoria()
+        
+        self.assertFalse(self.__juego__.esta_terminado())
+        self.assertIsNone(self.__juego__.get_ganador())
     
     def test_verificar_victoria_jugador_negro_gana(self):
         """
@@ -1022,6 +1472,27 @@ class TestBackgammonGame(unittest.TestCase):
         # verificar ganador
         ganador = self.__juego__.get_ganador()
         self.assertEqual(ganador, self.__juego__.get_jugador2())
+
+    def test_verificar_victoria_negro_no_gana_si_blanco_tiene_barra(self):
+        """
+        Prueba que negro no gana si el blanco tiene fichas en barra.
+        
+        Recibe: Nada
+        Hace: Verifica que no declara victoria cuando blanco tiene barra
+        Devuelve: Nada
+        """
+        self.__juego__.terminar_turno()
+        tablero = self.limpiar_tablero()
+        
+        # colocar una ficha blanca en barra
+        ficha_blanca = Checker('blanco')
+        ficha_blanca.set_posicion(0)
+        tablero.get_fichas_en_punto(0).append(ficha_blanca)
+        
+        self.__juego__.verificar_victoria()
+        
+        self.assertFalse(self.__juego__.esta_terminado())
+        self.assertIsNone(self.__juego__.get_ganador())
     
     def test_verificar_victoria_con_fichas_en_barra_blanco(self):
         """
@@ -1143,10 +1614,18 @@ class TestBackgammonGame(unittest.TestCase):
                 lista.pop()
             punto = punto + 1
         
-        # poner una ficha blanca en punto 1
+        # poner una ficha blanca en punto 13
         ficha = Checker('blanco')
-        ficha.set_posicion(1)
-        tablero.get_fichas_en_punto(1).append(ficha)
+        ficha.set_posicion(13)
+        tablero.get_fichas_en_punto(13).append(ficha)
+        
+        # bloquear el destino validado (punto 7) con dos negras
+        contador_bloqueo = 0
+        while contador_bloqueo < 2:
+            ficha_negra = Checker('negro')
+            ficha_negra.set_posicion(7)
+            tablero.get_fichas_en_punto(7).append(ficha_negra)
+            contador_bloqueo = contador_bloqueo + 1
         
         # tirar dado grande
         import random
@@ -1171,6 +1650,24 @@ class TestBackgammonGame(unittest.TestCase):
         finally:
             random.randint = original
     
+    def test_pasar_turno_si_no_hay_movimientos_desde_jugador_dos(self):
+        """
+        Prueba pasar turno automatico cuando el turno es del jugador 2.
+        
+        Recibe: Nada
+        Hace: Verifica que cambia de jugador usando la rama alternativa
+        Devuelve: Nada
+        """
+        self.__juego__.terminar_turno()
+        movimientos = self.__juego__.get_movimientos_disponibles()
+        movimientos.clear()
+        
+        resultado = self.__juego__.pasar_turno_si_no_hay_movimientos()
+        
+        self.assertTrue(resultado)
+        self.assertEqual(self.__juego__.get_jugador_actual(), self.__juego__.get_jugador1())
+        self.assertFalse(self.__juego__.turno_paso_automaticamente())
+    
     def test_pasar_turno_si_no_hay_movimientos_activa_flag(self):
         """
         Prueba que activa el flag de turno automatico.
@@ -1188,10 +1685,18 @@ class TestBackgammonGame(unittest.TestCase):
                 lista.pop()
             punto = punto + 1
         
-        # poner una ficha blanca en punto 1
+        # poner una ficha blanca en punto 13
         ficha = Checker('blanco')
-        ficha.set_posicion(1)
-        tablero.get_fichas_en_punto(1).append(ficha)
+        ficha.set_posicion(13)
+        tablero.get_fichas_en_punto(13).append(ficha)
+        
+        # bloquear el destino con dos fichas negras en punto 7
+        contador_bloqueo = 0
+        while contador_bloqueo < 2:
+            ficha_negra = Checker('negro')
+            ficha_negra.set_posicion(7)
+            tablero.get_fichas_en_punto(7).append(ficha_negra)
+            contador_bloqueo = contador_bloqueo + 1
         
         # tirar dado grande
         import random

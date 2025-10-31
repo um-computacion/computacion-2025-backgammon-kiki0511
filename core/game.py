@@ -290,9 +290,53 @@ class BackgammonGame:
         if color == 'blanco':
             # blanco se mueve hacia abajo (resta)
             destino = punto_origen - valor_dado
+            
+            if destino < 1:
+                # intento sacar ficha del tablero (bear off)
+                puede_sacar = tablero.puede_sacar_fichas(color)
+                if puede_sacar == False:
+                    return False
+                
+                if destino == 0:
+                    return True
+                
+                # dado mayor al necesario: solo si no hay fichas en puntos superiores
+                punto_revision = punto_origen + 1
+                while punto_revision <= 6:
+                    fichas_revision = tablero.get_fichas_en_punto(punto_revision)
+                    indice_revision = 0
+                    while indice_revision < len(fichas_revision):
+                        if fichas_revision[indice_revision].get_color() == color:
+                            return False
+                        indice_revision = indice_revision + 1
+                    punto_revision = punto_revision + 1
+                
+                return True
         else:
             # negro se mueve hacia arriba (suma)
             destino = punto_origen + valor_dado
+            
+            if destino > 24:
+                # intento sacar ficha del tablero (bear off)
+                puede_sacar = tablero.puede_sacar_fichas(color)
+                if puede_sacar == False:
+                    return False
+                
+                if destino == 25:
+                    return True
+                
+                # dado mayor al necesario: solo si no hay fichas en puntos superiores
+                punto_revision = punto_origen + 1
+                while punto_revision <= 24:
+                    fichas_revision = tablero.get_fichas_en_punto(punto_revision)
+                    indice_revision = 0
+                    while indice_revision < len(fichas_revision):
+                        if fichas_revision[indice_revision].get_color() == color:
+                            return False
+                        indice_revision = indice_revision + 1
+                    punto_revision = punto_revision + 1
+                
+                return True
         
         # verifico que el destino este dentro del tablero
         if destino < 1 or destino > 24:
@@ -400,8 +444,21 @@ class BackgammonGame:
             # es un reingreso desde la barra
             movimiento_exitoso = tablero.reingresar_desde_barra(color, destino)
         else:
-            # es un movimiento normal
-            movimiento_exitoso = tablero.mover_ficha(punto_origen, destino, color)
+            # determinar si es un bear off
+            es_bear_off = False
+            if color == 'blanco' and destino < 1:
+                es_bear_off = True
+            if color == 'negro' and destino > 24:
+                es_bear_off = True
+
+            if es_bear_off:
+                movimiento_exitoso = tablero.sacar_ficha_del_tablero(punto_origen, color)
+                if movimiento_exitoso == True:
+                    jugador_actual = self.get_jugador_actual()
+                    jugador_actual.sacar_ficha_del_tablero()
+            else:
+                # es un movimiento normal
+                movimiento_exitoso = tablero.mover_ficha(punto_origen, destino, color)
         
         # si el movimiento no se pudo hacer, devuelvo False
         if movimiento_exitoso == False:
@@ -533,16 +590,16 @@ class BackgammonGame:
         if puedo_mover == False:
             self.__turno_paso_automatico__ = True
 
-            # cambiar manualmente de jugador porque no hay movimientos
+            # cambiar manualmente de jugador
             if self.__jugador_actual__ == self.__jugador1__:
                 self.__jugador_actual__ = self.__jugador2__
             else:
                 self.__jugador_actual__ = self.__jugador1__
 
-            # limpiar los movimientos para el nuevo turno
+            # limpiar movimientos para el nuevo turno
             self.__movimientos_disponibles__ = []
 
-            # resetear el flag para reflejar el estado final del turno
+            # resetear flag para reflejar el estado final
             self.__turno_paso_automatico__ = False
             return True
         

@@ -239,12 +239,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - He creado varios Fix donde arreglo clase ;  y ademas agrego varios Docstrings.
 
-#### [0.4.6] - 2024-10-10
+#### [0.4.6] - 2024-10-25
 
 ### Added
-- Implementé un entrypoint explícito en `__main__.py` para facilitar la ejecución del juego con `python __main__.py`.
-- Incorporé un alias `Player.agregar_ficha_sacada` y tests adicionales para cubrir la representación textual del jugador, llevando la cobertura del módulo al 100%.
-- Añadí una propiedad interna en `CLI` que permite inyectar juegos simulados desde los tests y creé una suite de 41 pruebas unitarias que ejercen toda la lógica de la interfaz.
+- Cree los test de la clase cli. 
 
-### Changed
-- Ajusté la configuración de tests y cobertura para incluir el paquete `cli`, elevando la cobertura total del proyecto al 99%.
+#### [0.4.7] - 2024-15-27
+
+### Added
+- Mejoro la cobertura de las clases.
+
+
