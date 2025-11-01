@@ -1,7 +1,7 @@
 import pygame
 import sys
 
-# importar desde core
+# importar desde core y game
 from core.game import BackgammonGame
 
 
