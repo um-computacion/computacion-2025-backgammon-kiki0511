@@ -266,7 +266,7 @@ class CLI:
                 # verificar si puede hacer algun movimiento
                 puede_mover = self.__juego__.puede_hacer_algun_movimiento()
                 if puede_mover == False:
-                    print("No hay más movimientos válidos. Turno terminado.")
+                    print("No hay mas movimientos validos. Turno terminado.")
                     self.__juego__.terminar_turno()
         else:
             print("Movimiento inválido. Verifica:")

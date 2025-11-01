@@ -648,6 +648,31 @@ class BackgammonGame:
         # guardo si el turno paso automaticamente
         estado['turno_paso_automatico'] = self.__turno_paso_automatico__
         
+        # obtengo el tablero para consultar fichas en barra
+        tablero = self.__tablero__
+        
+        # cuento fichas en barra del jugador 1 (blanco)
+        fichas_barra_j1 = tablero.contar_fichas_en_barra('blanco')
+        if fichas_barra_j1 > 0:
+            estado['fichas_en_barra_j1'] = True
+        else:
+            estado['fichas_en_barra_j1'] = False
+        
+        # cuento fichas en barra del jugador 2 (negro)
+        fichas_barra_j2 = tablero.contar_fichas_en_barra('negro')
+        if fichas_barra_j2 > 0:
+            estado['fichas_en_barra_j2'] = True
+        else:
+            estado['fichas_en_barra_j2'] = False
+        
+        # cuento fichas sacadas del jugador 1 (blanco)
+        fichas_sacadas_j1 = tablero.contar_fichas_sacadas('blanco')
+        estado['fichas_sacadas_j1'] = fichas_sacadas_j1
+        
+        # cuento fichas sacadas del jugador 2 (negro)
+        fichas_sacadas_j2 = tablero.contar_fichas_sacadas('negro')
+        estado['fichas_sacadas_j2'] = fichas_sacadas_j2
+        
         return estado
 
     def __str__(self):
