@@ -1,7 +1,4 @@
 pygame==2.5.2  #libreria para hacer juegos en python por intefaz grafica 
-ruff==0.6.9  #analizador estatico de codigo para python
 isort==5.13.2  #ordenear los import
-
 coverage    #para medir el coverage de los tests
-
 pygame==2.5.2
